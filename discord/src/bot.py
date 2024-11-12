@@ -8,18 +8,22 @@ import pandas as pd
 from pytz import timezone
 from dotenv import load_dotenv
 
+# Load environment variables from .env file
 load_dotenv()
 
+# Set up Discord bot intents
 intents = discord.Intents.default()
 intents.message_content = True
 intents.guilds = True
 
+# Initialize bot instance with command prefix
 bot = commands.Bot(command_prefix='$', intents=intents)
 
 def get_user_info(df, username):
-    # Ensure the "Money In Account" column is numeric
+    """
+    Retrieve and format information for a specific user from the DataFrame.
+    """
     df["Money In Account"] = pd.to_numeric(df["Money In Account"], errors="coerce")
-    # Find the user in the DataFrame
     user_row = df[df["Account Name"] == username]
     if user_row.empty:
         return None
@@ -27,39 +31,41 @@ def get_user_info(df, username):
     user_name = user_data["Account Name"]
     user_money = user_data["Money In Account"]
     user_stocks = user_data["Stocks Invested In"]
-    # Format holdings
     formatted_holdings = "\n".join(
         [f"{stock[0]}: {stock[1]} ({stock[2]})" for stock in user_stocks]
     )
     return user_name, user_money, formatted_holdings
 
-# Load usernames from usernames.txt
+# Load usernames from file
 with open("./backend/portfolios/usernames.txt", "r") as f:
     usernames_list = [line.strip() for line in f.readlines()]
 
 class UserInfo(commands.Cog):
+    """
+    Cog to handle user information related commands.
+    """
     def __init__(self, bot):
         self.bot = bot
 
     @app_commands.command(name="userinfo", description="Get user information")
     @app_commands.describe(username="Select a username")
     async def userinfo(self, interaction: discord.Interaction, username: str):
+        """
+        Respond to the /userinfo command with the user's information.
+        """
         await interaction.response.defer()
         try:
             with open("./backend/leaderboards/leaderboard-latest.json", "r") as file:
                 data = json.load(file)
             df = pd.DataFrame.from_dict(data, orient="index")
             df.reset_index(inplace=True)
-            df.columns = [
-                "Account Name",
-                "Money In Account",
-                "Investopedia Link",
-                "Stocks Invested In",
-            ]
+            df.columns = ["Account Name", "Money In Account", "Investopedia Link", "Stocks Invested In"]
+
             user_info = get_user_info(df, username)
             if user_info is None:
                 await interaction.followup.send(f"User '{username}' not found.")
                 return
+
             user_name, user_money, user_holdings = user_info
             embed = discord.Embed(
                 colour=discord.Colour.blue(),
@@ -76,36 +82,42 @@ class UserInfo(commands.Cog):
 
     @userinfo.autocomplete("username")
     async def username_autocomplete(self, interaction: discord.Interaction, current: str):
+        """
+        Provide autocomplete suggestions for usernames based on current input.
+        """
         return [
             app_commands.Choice(name=username, value=username)
             for username in usernames_list if current.lower() in username.lower()
         ][:25]
 
 async def setup(bot):
+    """
+    Add the UserInfo cog to the bot.
+    """
     await bot.add_cog(UserInfo(bot))
 
-# Fix setup_hook implementation
 async def setup_hook():
+    """
+    Run setup when the bot is ready.
+    """
     await setup(bot)
 
 bot.setup_hook = setup_hook
 
 @bot.tree.command(name="leaderboard", description="Get current leaderboard")
 async def leaderboard(interaction: discord.Interaction):
+    """
+    Respond to the /leaderboard command with the top-ranked user's info.
+    """
     await interaction.response.defer()
     try:
         with open("./backend/leaderboards/leaderboard-latest.json", "r") as file:
             data = json.load(file)
         df = pd.DataFrame.from_dict(data, orient="index")
         df.reset_index(inplace=True)
-        df.columns = [
-            "Account Name",
-            "Money In Account",
-            "Investopedia Link",
-            "Stocks Invested In",
-        ]
-        # Sort the DataFrame by "Money In Account" in descending order
+        df.columns = ["Account Name", "Money In Account", "Investopedia Link", "Stocks Invested In"]
         df.sort_values(by="Money In Account", ascending=False, inplace=True)
+
         top_ranked_name, top_ranked_money, top_ranked_stocks = get_user_info(df, df.iloc[0]["Account Name"])
         embed = discord.Embed(
             colour=discord.Colour.dark_red(),
@@ -121,11 +133,13 @@ async def leaderboard(interaction: discord.Interaction):
     except Exception as e:
         await interaction.followup.send(f"Error fetching leaderboard: {str(e)}")
 
-# Convert send_leaderboard to a task
 @tasks.loop(minutes=1)
 async def send_leaderboard():
+    """
+    Periodically send the leaderboard update to the Discord channel during trading hours.
+    """
     now = datetime.datetime.now(timezone("US/Eastern"))
-    if now.weekday() < 5:  # Monday-Friday are 0-4
+    if now.weekday() < 5:
         start_time = now.replace(hour=9, minute=15, second=0, microsecond=0)
         end_time = now.replace(hour=16, minute=15, second=0, microsecond=0)
         if start_time <= now <= end_time:
@@ -134,14 +148,9 @@ async def send_leaderboard():
                     data = json.load(file)
                 df = pd.DataFrame.from_dict(data, orient="index")
                 df.reset_index(inplace=True)
-                df.columns = [
-                    "Account Name", 
-                    "Money In Account",
-                    "Investopedia Link",
-                    "Stocks Invested In"
-                ]
-                # Sort the DataFrame by "Money In Account" in descending order
+                df.columns = ["Account Name", "Money In Account", "Investopedia Link", "Stocks Invested In"]
                 df.sort_values(by="Money In Account", ascending=False, inplace=True)
+
                 top_ranked_name, top_ranked_money, top_ranked_stocks = get_user_info(df, df.iloc[0]["Account Name"])
                 channel_id = int(os.environ.get("DISCORD_CHANNEL_ID"))
                 channel = bot.get_channel(channel_id)
@@ -162,14 +171,17 @@ async def send_leaderboard():
 
 @bot.event
 async def on_ready():
+    """
+    Actions to perform when the bot is fully ready.
+    """
     print(f"Logged in as {bot.user}")
     try:
         synced = await bot.tree.sync()
         print(f"Synced {len(synced)} command(s)")
-        # Start the task after sync
         send_leaderboard.start()
     except Exception as e:
         print(f"Failed to sync commands: {e}")
 
+# Run the bot with the provided token from environment variables
 DISCORD_BOT_TOKEN = os.environ.get("DISCORD_BOT_TOKEN")
 bot.run(DISCORD_BOT_TOKEN)
