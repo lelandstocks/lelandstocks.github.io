@@ -32,3 +32,4 @@ audioop-lts = ">=0.2.1, <0.3"
 python-dotenv = ">=1.0.1, <2"
 podcastfy = ">=0.1.13, <0.2"
 playwright = ">=1.48.0, <2"
+polars = { version = ">=1.13.0, <2", extras = ["all"] }
