@@ -244,6 +244,84 @@ def make_user_page(player_name):
         return rendered
 
 
+def make_user_pages(usernames):
+    """Generate HTML pages for multiple users at once"""
+    with app.app_context():
+        leaderboard_files = sorted(glob("./backend/leaderboards/in_time/*"))
+        
+        # Load and process all leaderboard data once
+        labels = []
+        all_dfs = []
+        
+        for file in leaderboard_files:
+            with open(file, "r") as f:
+                dict_leaderboard = json.load(f)
+                
+            # Process datetime for label
+            file_name = os.path.basename(f.name)
+            date_time_str = file_name[len("leaderboard-"):-len(".json")]
+            date_time_str = date_time_str.replace("_", ":")
+            date_time_str = (datetime.strptime(date_time_str, "%Y-%m-%d-%H:%M") - timedelta(hours=3, minutes=0)).strftime("%H:%M:%S %m-%d-%Y")
+            labels.append(date_time_str)
+            
+            # Process DataFrame once
+            df = pd.DataFrame.from_dict(dict_leaderboard, orient="index")
+            df.reset_index(level=0, inplace=True)
+            if len(df.columns) == 3:
+                df["Stocks Invested In"] = [0 for i in range(len(df))]
+            df.columns = ["Account Name", "Money In Account", "Investopedia Link", "Stocks Invested In"]
+            df = df.sort_values(by=["Money In Account"], ascending=False)
+            df["Ranking"] = range(1, 1 + len(df))
+            all_dfs.append(df)
+            
+        # Get latest df for stock information
+        latest_df = all_dfs[-1]
+            
+        # Process each user using the pre-processed data
+        for player_name in usernames:
+            player_money = []
+            rankings = []
+            
+            # Check if player exists in latest data
+            if player_name not in latest_df["Account Name"].values:
+                continue
+                
+            # Extract data for this player from all timepoints
+            for df in all_dfs:
+                if player_name in df["Account Name"].values:
+                    rankings.append(float(df.loc[df["Account Name"] == player_name, "Ranking"].values[0]))
+                    player_money.append(float(df.loc[df["Account Name"] == player_name, "Money In Account"].values[0]))
+            
+            # Get player details from latest data
+            investopedia_link = latest_df.loc[latest_df["Account Name"] == player_name, "Investopedia Link"].values[0]
+            player_stocks_data = latest_df.loc[latest_df["Account Name"] == player_name, "Stocks Invested In"].iloc[0]
+            
+            # Process stock data
+            player_stocks = [
+                [
+                    stock[0],
+                    float(stock[1].replace("$", "").replace(",", "")),
+                    float(stock[2].replace("%", ""))
+                ]
+                for stock in player_stocks_data
+            ]
+
+            # Render template
+            rendered = render_template(
+                "player.html",
+                labels=labels,
+                player_money=player_money,
+                player_name=player_name,
+                investopedia_link=investopedia_link,
+                player_stocks=player_stocks,
+                update_time=datetime.utcnow().astimezone(ZoneInfo("US/Pacific")).strftime("%H:%M:%S %m-%d-%Y"),
+                zip=zip,
+            )
+            
+            with open(f"players/{player_name}.html", "w") as f:
+                f.write(rendered)
+
+
 if __name__ == "__main__":
     with app.app_context():
         ### This whole section makes the chart shown at the top of the page!

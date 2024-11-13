@@ -1,16 +1,14 @@
 import json
 import os
-import time
 from datetime import datetime
 import pickle
-import concurrent.futures
 import random
 import asyncio
 from playwright.async_api import async_playwright
 
 import pytz
 from dotenv import load_dotenv
-from make_webpage import make_index_page, make_user_page
+from make_webpage import make_index_page, make_user_pages, make_user_page
 
 load_dotenv()
 
@@ -201,7 +199,7 @@ async def process_single_account(context, url):
             SCREENSHOT_DIR, f"error_{timestamp}_{url.split('/')[-1]}.png"
         )
         await page.screenshot(path=screenshot_path, full_page=True)
-        return None
+        return "retry"
     finally:
         await page.close()  # Close tab instead of browser
 
@@ -223,7 +221,11 @@ async def get_account_information():
 
         async def process_with_semaphore(url):
             async with semaphore:
-                return await process_single_account(context, url)
+                res = await process_single_account(context, url)
+                while res == "retry":
+                    print("Retrying...", url)
+                    res = await process_single_account(context, url)
+                return res
 
         try:
             tasks = [process_with_semaphore(url) for url in urls]
@@ -274,17 +276,15 @@ async def main():
 
         elif os.environ.get("DONT_UPDATE") == "True":
             print("Update disabled")
+
         # Update index.html
         with open("index.html", "w") as file:
             file.write(make_index_page())
 
-        # Read usernames
+        # Read usernames and generate all pages at once
         with open("./backend/portfolios/usernames.txt", "r") as file:
             usernames = [user.strip() for user in file.readlines()]
-
-        # Parallelize user page generation
-        with concurrent.futures.ProcessPoolExecutor() as executor:
-            executor.map(generate_user_page, usernames)
+            make_user_pages(usernames)
 
 
 if __name__ == "__main__":
