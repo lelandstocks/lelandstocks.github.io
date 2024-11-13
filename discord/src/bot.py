@@ -36,6 +36,82 @@ def get_user_info(df, username):
     )
     return user_name, user_money, formatted_holdings
 
+def get_latest_in_time_leaderboard():
+    """
+    Get the most recent leaderboard file from the in_time directory.
+    """
+    in_time_dir = "./backend/leaderboards/in_time"
+    files = [f for f in os.listdir(in_time_dir) if f.endswith('.json')]
+    if not files:
+        return None
+    latest_file = max(files, key=lambda x: os.path.getctime(os.path.join(in_time_dir, x)))
+    return os.path.join(in_time_dir, latest_file)
+
+async def compare_stock_changes(channel):
+    """
+    Compare current leaderboard with previous snapshot to detect stock changes, and send updates to the Discord channel as embeds.
+    """
+    try:
+        # Load the latest snapshot from in_time directory
+        latest_in_time = get_latest_in_time_leaderboard()
+        if not latest_in_time:
+            await channel.send("No historical data found")
+            return
+
+        # Load both leaderboards
+        with open(latest_in_time, 'r') as f:
+            previous_data = json.load(f)
+        with open("./backend/leaderboards/leaderboard-latest.json", 'r') as f:
+            current_data = json.load(f)
+
+        any_changes = False
+        # Compare holdings for each user
+        for username in current_data:
+            if username not in previous_data:
+                continue
+
+            # Get current and previous stock symbols
+            current_stocks = set(stock[0] for stock in current_data[username][2])
+            previous_stocks = set(stock[0] for stock in previous_data[username][2])
+
+            # Find new and removed stocks
+            new_stocks = current_stocks - previous_stocks
+            removed_stocks = previous_stocks - current_stocks
+
+            if new_stocks or removed_stocks:
+                any_changes = True
+                description = ""
+                for stock in new_stocks:
+                    description += f"+ Bought {stock}\n"
+                for stock in removed_stocks:
+                    description += f"- Sold {stock}\n"
+
+                embed = discord.Embed(
+                    colour=discord.Colour.green(),
+                    title=f"Stock Changes for {username}",
+                    description=description,
+                    timestamp=discord.utils.utcnow()
+                )
+                await channel.send(embed=embed)
+
+        if not any_changes:
+            embed = discord.Embed(
+                colour=discord.Colour.greyple(),
+                title="No Stock Changes Detected",
+                timestamp=discord.utils.utcnow()
+            )
+            await channel.send(embed=embed)
+
+        # Update the snapshot with current data
+        snapshot_path = "./backend/leaderboards/in_time/leaderboard-snapshot.json"
+        with open(snapshot_path, 'w') as f:
+            json.dump(current_data, f)
+
+    except Exception as e:
+        await channel.send(f"Error comparing stock changes: {str(e)}")
+        import traceback
+        traceback.print_exc()
+
 # Load usernames from file
 with open("./backend/portfolios/usernames.txt", "r") as f:
     usernames_list = [line.strip() for line in f.readlines()]
@@ -136,7 +212,7 @@ async def leaderboard(interaction: discord.Interaction):
 @tasks.loop(minutes=1)
 async def send_leaderboard():
     """
-    Periodically send the leaderboard update to the Discord channel during trading hours.
+    Periodically send the leaderboard update to the Discord channels during trading hours.
     """
     now = datetime.datetime.now(timezone("US/Eastern"))
     if now.weekday() < 5:
@@ -152,9 +228,12 @@ async def send_leaderboard():
                 df.sort_values(by="Money In Account", ascending=False, inplace=True)
 
                 top_ranked_name, top_ranked_money, top_ranked_stocks = get_user_info(df, df.iloc[0]["Account Name"])
-                channel_id = int(os.environ.get("DISCORD_CHANNEL_ID"))
-                channel = bot.get_channel(channel_id)
-                if channel:
+                leaderboard_channel_id = int(os.environ.get("DISCORD_CHANNEL_ID_Leaderboard"))
+                stocks_channel_id = int(os.environ.get("DISCORD_CHANNEL_ID_Stocks"))
+                leaderboard_channel = bot.get_channel(leaderboard_channel_id)
+                stocks_channel = bot.get_channel(stocks_channel_id)
+
+                if leaderboard_channel:
                     embed = discord.Embed(
                         colour=discord.Colour.dark_red(),
                         title="Leaderboard Update!",
@@ -165,7 +244,11 @@ async def send_leaderboard():
                         ),
                         timestamp=discord.utils.utcnow(),
                     )
-                    await channel.send(embed=embed)
+                    await leaderboard_channel.send(embed=embed)
+
+                if stocks_channel:
+                    await compare_stock_changes(stocks_channel)
+
             except Exception as e:
                 print(f"Error in send_leaderboard: {str(e)}")
 
