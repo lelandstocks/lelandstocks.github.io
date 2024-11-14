@@ -54,10 +54,10 @@ def get_latest_in_time_leaderboard():
 
 async def compare_stock_changes(channel):
     """
-    Compare current leaderboard with previous snapshot to detect stock changes, and send updates to the Discord channel as embeds.
+    Compare current leaderboard with the latest in_time leaderboard to detect stock changes, and send updates to the Discord channel as embeds.
     """
     try:
-        # Load the latest snapshot from in_time directory
+        # Load the latest in_time leaderboard
         latest_in_time = get_latest_in_time_leaderboard()
         if not latest_in_time:
             await channel.send("No historical data found")
@@ -106,11 +106,6 @@ async def compare_stock_changes(channel):
                 timestamp=discord.utils.utcnow(),
             )
             await channel.send(embed=embed)
-
-        # Update the snapshot with current data
-        snapshot_path = "./backend/leaderboards/snapshots/leaderboard-snapshot.json"
-        with open(snapshot_path, "w") as f:
-            json.dump(current_data, f)
 
     except Exception as e:
         await channel.send(f"Error comparing stock changes: {str(e)}")
