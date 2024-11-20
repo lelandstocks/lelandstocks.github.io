@@ -27,7 +27,8 @@
     }
 
     .toggle-icon::after {
-        content: none;  /* Remove the triangle */
+        content: none;
+        /* Remove the triangle */
     }
 
     .toggle-icon svg {
@@ -48,11 +49,11 @@
         opacity: 0.5;
         transition: opacity 0.3s ease;
     }
-    
+
     .series-toggle.active {
         opacity: 1;
     }
-    
+
     /* Dark mode support */
     @media (prefers-color-scheme: dark) {
         .series-toggle {
@@ -60,7 +61,7 @@
             color: #fff;
             border-color: #666;
         }
-        
+
         .series-toggle.active {
             background-color: #444;
             border-color: #888;
@@ -75,11 +76,11 @@
         transition: opacity 0.3s ease;
         cursor: pointer;
     }
-    
+
     .legend-item.active {
         opacity: 1;
     }
-    
+
     .legend-color {
         display: inline-block;
         width: 12px;
@@ -87,7 +88,7 @@
         margin-right: 4px;
         border-radius: 2px;
     }
-    
+
     /* Dark mode support for legend */
     @media (prefers-color-scheme: dark) {
         .legend-item {
@@ -208,6 +209,8 @@
     </div>
 </div>
 
+
+
 <table class="w-full" id="rankings">
     <thead class="hidden md:table-header-group">
         <tr>
@@ -228,11 +231,14 @@
                         <span class="text-sm">{{ row[0] }}</span>
                         <span>{{ row[1] | safe }}</span>
                     </div>
-                    <button class="collapsible-header bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 px-3 py-1 rounded-md text-sm">
+                    <button
+                        class="collapsible-header bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 px-3 py-1 rounded-md text-sm">
                         <span class="toggle-icon flex items-center">
                             Details
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7" />
                             </svg>
                         </span>
                     </button>
@@ -258,7 +264,7 @@
 {% block scripts %}
 <script>
     function convertTZ(date, tzString) {
-        return new Date((typeof date === "string" ? new Date(date) : date).toLocaleString("en-US", {timeZone: tzString}));   
+        return new Date((typeof date === "string" ? new Date(date) : date).toLocaleString("en-US", { timeZone: tzString }));
     }
 
     function isDarkMode() {
@@ -346,7 +352,7 @@
     const chart = LightweightCharts.createChart(document.getElementById('stockChart'), chartOptions);
 
     const labels = {{ labels | safe }};
-    
+
     // Define all series first
     const sp500Series = chart.addAreaSeries({
         lineColor: '#FF6384',
@@ -354,7 +360,7 @@
         bottomColor: 'rgba(255, 99, 132, 0.1)',
         lineWidth: 2,
     });
-    
+
     const q1Series = chart.addAreaSeries({
         lineColor: '#9966FF',
         topColor: 'rgba(153, 102, 255, 0.4)',
@@ -399,7 +405,8 @@
         const pstDate = convertTZ(date, 'America/Los_Angeles');
         return {
             time: Math.floor(pstDate.getTime() / 1000),
-            value: {{ sp500_prices | safe }}[i] || 0
+            value: {{ sp500_prices | safe }
+    }[i] || 0
         };
     }).filter(item => item.value !== 0);
 
@@ -409,7 +416,8 @@
         const pstDate = convertTZ(date, 'America/Los_Angeles');
         return {
             time: Math.floor(pstDate.getTime() / 1000),
-            value: {{ q1_monies | safe }}[i] || 0
+            value: {{ q1_monies | safe }
+    }[i] || 0
         };
     }).filter(item => item.value !== 0);
 
@@ -419,7 +427,8 @@
         const pstDate = convertTZ(date, 'America/Los_Angeles');
         return {
             time: Math.floor(pstDate.getTime() / 1000),
-            value: {{ median_monies | safe }}[i] || 0
+            value: {{ median_monies | safe }
+    }[i] || 0
         };
     }).filter(item => item.value !== 0);
 
@@ -429,7 +438,8 @@
         const pstDate = convertTZ(date, 'America/Los_Angeles');
         return {
             time: Math.floor(pstDate.getTime() / 1000),
-            value: {{ q3_monies | safe }}[i] || 0
+            value: {{ q3_monies | safe }
+    }[i] || 0
         };
     }).filter(item => item.value !== 0);
 
@@ -438,7 +448,8 @@
         const pstDate = convertTZ(date, 'America/Los_Angeles');
         return {
             time: Math.floor(pstDate.getTime() / 1000),
-            value: {{ min_monies | safe }}[i] || 0
+            value: {{ min_monies | safe }
+    }[i] || 0
         };
     }).filter(item => item.value !== 0);
 
@@ -447,7 +458,8 @@
         const pstDate = convertTZ(date, 'America/Los_Angeles');
         return {
             time: Math.floor(pstDate.getTime() / 1000),
-            value: {{ max_monies | safe }}[i] || 0
+            value: {{ max_monies | safe }
+    }[i] || 0
         };
     }).filter(item => item.value !== 0);
 
@@ -489,7 +501,7 @@
             const days = parseInt(button.dataset.days);
             const now = Math.floor(Date.now() / 1000);
             const start = now - (days * 24 * 60 * 60);
-            
+
             chart.timeScale().setVisibleRange({
                 from: start,
                 to: now,
@@ -524,7 +536,7 @@
                 accountName.includes(searchTerm) ||
                 moneyText.includes(searchTerm) ||
                 stocksText.includes(searchTerm);
-                //zScoreText.includes(searchTerm);
+            //zScoreText.includes(searchTerm);
 
             // show/hide the row based on match
             row.style.display = matches ? '' : 'none';
@@ -532,13 +544,13 @@
     });
 
     // Add this at the end of your existing scripts block
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         // Add click handlers for collapsible sections
         document.querySelectorAll('.collapsible-header').forEach(header => {
-            header.addEventListener('click', function() {
+            header.addEventListener('click', function () {
                 const content = this.closest('div').nextElementSibling;
                 const icon = this.querySelector('.toggle-icon');
-                
+
                 // Close all other open sections
                 document.querySelectorAll('.collapsible-content.active').forEach(item => {
                     if (item !== content) {
@@ -547,7 +559,7 @@
                         if (otherIcon) otherIcon.classList.remove('active');
                     }
                 });
-                
+
                 // Toggle current section
                 content.classList.toggle('active');
                 icon.classList.toggle('active');
