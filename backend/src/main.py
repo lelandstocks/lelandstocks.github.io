@@ -279,9 +279,18 @@ async def main():
         with open("./backend/portfolios/usernames.txt", "r") as file:
             usernames = [user.strip() for user in file.readlines()]
             make_user_pages(usernames)
+    elif os.environ.get("MAKE_WEBPAGE") == "True":
+        # Update index.html
+        with open("index.html", "w") as file:
+            file.write(make_index_page())
+
+        # Read usernames and generate all pages at once
+        with open("./backend/portfolios/usernames.txt", "r") as file:
+            usernames = [user.strip() for user in file.readlines()]
+            make_user_pages(usernames)
 
     # Generate podcast after leaderboard update only at end of trading day ±15 minutes
-    end_of_day = curr_time.replace(hour=16, minute=0, second=0, microsecond=0)
+    end_of_day = curr_time.replace(hour=13, minute=0, second=0, microsecond=0)
     time_diff = abs((curr_time - end_of_day).total_seconds())
     if time_diff <= 15 * 60 or os.environ.get("FORCE_PODCAST") == "True":
         # Check last podcast generation time
@@ -298,15 +307,6 @@ async def main():
             generate_podcast_audio()
             with open(last_podcast_file, "w") as f:
                 f.write(curr_time.strftime("%Y-%m-%d"))
-    elif os.environ.get("MAKE_WEBPAGE") == "True":
-        # Update index.html
-        with open("index.html", "w") as file:
-            file.write(make_index_page())
-
-        # Read usernames and generate all pages at once
-        with open("./backend/portfolios/usernames.txt", "r") as file:
-            usernames = [user.strip() for user in file.readlines()]
-            make_user_pages(usernames)
 
 
 if __name__ == "__main__":
