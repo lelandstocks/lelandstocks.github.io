@@ -132,6 +132,10 @@ def make_index_page():
                 interval="15m",  # Changed from 10m to 15m
             )
             # Convert SP500 index to Pacific time
+            if not sp500.index.tzinfo:
+                sp500.index = sp500.index.tz_localize(
+                    "America/New_York"
+                )  # Localize to NY time
             sp500.index = sp500.index.tz_convert("America/Los_Angeles")
 
         # Second pass to collect data

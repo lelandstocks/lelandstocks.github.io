@@ -10,11 +10,9 @@ make_portfolio_links = "python ./backend/src/get_portfolios_from_leaderboard.py"
 main = "python ./backend/src/main.py"
 make_webpage = "rm index.html && python ./backend/src/make_webpage.py >> index.html"
 git_push = "git add -A . &&	git commit -m 'leaderboard update' && git push origin"
-update_discord = "python ./discord/src/bot.py"
 all = {depends-on = ["main", "git_push"]}
 
 [dependencies]
-python = ">=3.13.0,<3.14"
 requests = ">=2.32.3,<2.33"
 beautifulsoup4 = ">=4.12.3,<4.13"
 selenium = ">=4.25.0,<4.26"
@@ -24,11 +22,12 @@ ruff = ">=0.7.1,<0.8"
 scipy = ">=1.14.1,<2"
 babel = ">=2.14.0,<3"
 pre-commit = ">=4.0.1,<5"
+numpy = "1.*"
+python = ">=3.12.7,<3.13"
 
 [pypi-dependencies]
 yfinance = { version = ">=0.2.48, <0.3", extras = ["nospam", "repair"] }
-discord-py = ">=2.4.0, <3"
-audioop-lts = ">=0.2.1, <0.3"
 python-dotenv = ">=1.0.1, <2"
-podcastfy = ">=0.1.13, <0.2"
 playwright = ">=1.48.0, <2"
+podcastfy = ">=0.4.1, <0.5"
+fpdf2 = ">=2.8.1, <3"
