@@ -14,7 +14,7 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 tech_debate_config = {
     "word_count": 10000,  # Longer content for in-depth discussions
-    "conversation_style": ["analytical", "insulting", "toxic"],
+    "conversation_style": ["analytical", "news channel", "insulting", "toxic"],
     "roles_person1": "Botswana's Biggest Fan",
     "roles_person2": "Bearish Stock Trader",
     "dialogue_structure": [
