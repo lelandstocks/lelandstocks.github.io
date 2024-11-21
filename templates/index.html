@@ -4,6 +4,42 @@
 
 {% block extra_head %}
 <style>
+    /* Modern styling updates */
+    .page-header {
+        background: linear-gradient(135deg, #6366f1 0%, #3b82f6 100%);
+        padding: 2rem 0;
+        color: white;
+        margin-bottom: 2rem;
+    }
+
+    .stats-card {
+        background: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        padding: 1.5rem;
+        height: 100%;
+    }
+
+    .chart-wrapper {
+        background: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    /* Dark mode updates */
+    @media (prefers-color-scheme: dark) {
+        .stats-card, .chart-wrapper {
+            background: #1f2937;
+            border: 1px solid #374151;
+        }
+        
+        .page-header {
+            background: linear-gradient(135deg, #4f46e5 0%, #1d4ed8 100%);
+        }
+    }
+
     /* Keep only chart and search styles */
     .chart-container {
         min-height: 300px;
@@ -98,98 +134,185 @@
 {% endblock %}
 
 {% block content %}
-<h1 class="text-center text-2xl">Imagine if Investopedia was good at making a leaderboard</h1>
-<br>
-<p class="text-center text-xl">Last updated {{ update_time }}</p>
-<br>
-<p class="text-center text-xl">Code can be found at: <a href="https://github.com/lelandstocks/lelandstocks.github.io"
-        class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"> LelandStocks</a></p>
-<div class="flex flex-wrap justify-center">
-    <!-- Chart Container -->
-    <div class="w-full md:w-1/2 p-4 h-full md:h-auto flex flex-col"> <!-- Added flex-col -->
-        <!-- Replace buttons with clickable legend -->
-        <div class="legend flex justify-center mb-2 space-x-4">
-            <div class="legend-item cursor-pointer" data-series="min">
-                <span class="legend-color" style="background: #4BC0C0"></span>Min
-            </div>
-            <div class="legend-item cursor-pointer active" data-series="q1">
-                <span class="legend-color" style="background: #9966FF"></span>Q1
-            </div>
-            <div class="legend-item cursor-pointer active" data-series="median">
-                <span class="legend-color" style="background: #FFCE56"></span>Median
-            </div>
-            <div class="legend-item cursor-pointer active" data-series="q3">
-                <span class="legend-color" style="background: #FF9F40"></span>Q3
-            </div>
-            <div class="legend-item cursor-pointer" data-series="max">
-                <span class="legend-color" style="background: #36A2EB"></span>Max
-            </div>
-            <div class="legend-item cursor-pointer active" data-series="sp500">
-                <span class="legend-color" style="background: #FF6384"></span>S&P 500
+<div class="page-header">
+    <div class="container mx-auto px-4">
+        <h1 class="text-4xl font-bold text-center mb-2">Quicksilver Stock Exchange</h1>
+        <p class="text-center text-lg opacity-90">Last updated {{ update_time }}</p>
+        <p class="text-center mt-2">
+            <a href="https://github.com/lelandstocks/lelandstocks.github.io" 
+               class="inline-flex items-center text-white hover:text-gray-200">
+                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                </svg>
+                View on GitHub
+            </a>
+        </p>
+    </div>
+</div>
+
+<div class="container mx-auto px-4">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Main chart section -->
+        <div class="lg:col-span-8">
+            <div class="chart-wrapper">
+                <div class="legend flex justify-center mb-4 space-x-4">
+                    <div class="legend-item cursor-pointer" data-series="min">
+                        <span class="legend-color" style="background: #4BC0C0"></span>Min
+                    </div>
+                    <div class="legend-item cursor-pointer active" data-series="q1">
+                        <span class="legend-color" style="background: #9966FF"></span>Q1
+                    </div>
+                    <div class="legend-item cursor-pointer active" data-series="median">
+                        <span class="legend-color" style="background: #FFCE56"></span>Median
+                    </div>
+                    <div class="legend-item cursor-pointer active" data-series="q3">
+                        <span class="legend-color" style="background: #FF9F40"></span>Q3
+                    </div>
+                    <div class="legend-item cursor-pointer" data-series="max">
+                        <span class="legend-color" style="background: #36A2EB"></span>Max
+                    </div>
+                    <div class="legend-item cursor-pointer active" data-series="sp500">
+                        <span class="legend-color" style="background: #FF6384"></span>S&P 500
+                    </div>
+                </div>
+                <div class="flex-grow chart-container" id="chart-container">
+                    <div id="stockChart"></div>
+                </div>
+                <div class="text-center mt-4 space-x-2">
+                    <button class="uk-button uk-button-default" id="resetZoom">Reset Zoom</button>
+                    <button class="uk-button uk-button-default time-range" data-days="1">1D</button>
+                    <button class="uk-button uk-button-default time-range" data-days="7">1W</button>
+                    <button class="uk-button uk-button-default time-range" data-days="30">1M</button>
+                    <button class="uk-button uk-button-default time-range" data-days="365">1Y</button>
+                </div>
             </div>
         </div>
-        <div class="flex-grow chart-container" id="chartContainer">
-            <div id="stockChart"></div>
-        </div>
-        <div class="text-center mt-2 space-x-2">
-            <button class="uk-button uk-button-default" id="resetZoom">Reset Zoom</button>
-            <button class="uk-button uk-button-default time-range" data-days="1">1D</button>
-            <button class="uk-button uk-button-default time-range" data-days="7">1W</button>
-            <button class="uk-button uk-button-default time-range" data-days="30">1M</button>
-            <button class="uk-button uk-button-default time-range" data-days="365">1Y</button>
+
+        <!-- Stats section -->
+        <div class="lg:col-span-4 grid gap-6">
+            <div class="stats-card">
+                <h2 class="text-xl font-semibold mb-4">Summary Statistics</h2>
+                <div class="space-y-3">
+                    <div class="flex justify-between">
+                        <span>Miller Tracker</span>
+                        <span class="font-medium">#{{ miller_location }}th place</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Average Money</span>
+                        <span class="font-medium">{{ average_money }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Q1 Money</span>
+                        <span class="font-medium">{{ q1_money }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Median Money</span>
+                        <span class="font-medium">{{ median_money }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Q3 Money</span>
+                        <span class="font-medium">{{ q3_money }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Standard Deviation Money</span>
+                        <span class="font-medium">{{ std_money }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stats-card">
+                <h2 class="text-xl font-semibold mb-4">Popular Stocks</h2>
+                <div class="max-h-[300px] overflow-y-auto">
+                    <table class="uk-table uk-table-striped uk-table-responsive">
+                        <thead>
+                            <tr>
+                                <th>Stock</th>
+                                <th>Count</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for stock, count in stock_cnt %}
+                            <tr>
+                                <td>{{ stock }}</td>
+                                <td>{{ count }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
-    <!-- Vertical Summary Statistics Table -->
-    <div class="w-full md:w-1/4 p-4 md:h-3/4">
-        <table class="uk-table uk-table-striped uk-table-responsive">
-            <thead>
-                <tr>
-                    <th colspan="2" class="text-center">Summary Statistics</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <th>Miller Tracker</th>
-                    <td>#{{ miller_location }}th place</td>
-                </tr>
-                <tr>
-                    <th>Average Money</th>
-                    <td>{{ average_money }}</td>
-                </tr>
-                <tr>
-                    <th>Q1 Money</th>
-                    <td>{{ q1_money }}</td>
-                </tr>
-                <tr>
-                    <th>Median Money</th>
-                    <td>{{ median_money }}</td>
-                </tr>
-                <tr>
-                    <th>Q3 Money</th>
-                    <td>{{ q3_money }}</td>
-                </tr>
-                <tr>
-                    <th>Standard Deviation Money</th>
-                    <td>{{ std_money }}</td>
-                </tr>
-            </tbody>
-        </table>
+
+    <!-- Podcast section -->
+    <div class="my-8">
+        <div class="stats-card max-w-2xl mx-auto">
+            <h2 class="text-xl font-semibold mb-4 text-center">Daily Market Update</h2>
+            {% if podcast_file %}
+                <div class="mb-4">
+                    <p class="text-center">Daily Generated</p>
+                    <audio controls class="w-full">
+                        <source src="/data/audio/{{ podcast_file }}" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+                </div>
+            {% else %}
+                <p class="text-center">No podcast available at the moment.</p>
+            {% endif %}
+        </div>
     </div>
-    <!-- New section for stocks and their counts -->
-    <div class="w-full md:w-1/4 p-4 md:h-3/4">
-        <div class="overflow-y-auto" style="max-height: 400px;">
-            <table class="uk-table uk-table-striped uk-table-responsive">
-                <thead>
+
+    <!-- Search and rankings -->
+    <div class="stats-card mt-8">
+        <div class="max-w-2xl mx-auto mb-6">
+            <input type="text" 
+                   id="accountSearch" 
+                   placeholder="Search for accounts or stocks..."
+                   class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full" id="rankings">
+                <thead class="hidden md:table-header-group">
                     <tr>
-                        <th>Stock</th>
-                        <th>Count</th>
+                        <th class="px-4 py-2">Rank</th>
+                        <th class="px-4 py-2">Account</th>
+                        <th class="hidden md:table-cell px-4 py-2">Account Value</th>
+                        <th class="hidden md:table-cell px-4 py-2">Stocks Invested</th>
+                        <th class="hidden md:table-cell px-4 py-2">Z-Score</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for stock, count in stock_cnt %}
-                    <tr>
-                        <td>{{ stock }}</td>
-                        <td>{{ count }}</td>
+                    {% for row in row_data %}
+                    <tr class="border-b {% if 'teachermiller' in row %}font-bold{% endif %}">
+                        <!-- Mobile view -->
+                        <td class="md:hidden">
+                            <div class="flex items-center justify-between p-4">
+                                <div class="flex items-center space-x-4">
+                                    <span class="text-sm">{{ row[0] }}</span>
+                                    <span>{{ row[1] | safe }}</span>
+                                </div>
+                                <button class="collapsible-header bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 px-3 py-1 rounded-md text-sm">
+                                    <span class="toggle-icon flex items-center">
+                                        Details
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </span>
+                                </button>
+                            </div>
+                            <div class="collapsible-content px-4 py-2 bg-gray-50 dark:bg-gray-900">
+                                <p class="py-1"><span class="font-semibold">Account Value:</span> {{ row[2] }}</p>
+                                <p class="py-1"><span class="font-semibold">Stocks Invested:</span> {{ row[3] }}</p>
+                                <p class="py-1"><span class="font-semibold">Z-Score:</span> {{ row[4] }}</p>
+                            </div>
+                        </td>
+                        <!-- Desktop view -->
+                        <td class="hidden md:table-cell px-4 py-2">{{ row[0] }}</td>
+                        <td class="hidden md:table-cell px-4 py-2">{{ row[1] | safe }}</td>
+                        <td class="hidden md:table-cell px-4 py-2">{{ row[2] }}</td>
+                        <td class="hidden md:table-cell px-4 py-2">{{ row[3] }}</td>
+                        <td class="hidden md:table-cell px-4 py-2">{{ row[4] }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -197,80 +320,6 @@
         </div>
     </div>
 </div>
-
-</br>
-
-<!-- Podcast Section -->
-<div class="max-w-2xl mx-auto px-4 w-full mt-8">
-    <h2 class="text-center text-xl mb-4">Latest Podcast</h2>
-    {% if podcast_file %}
-        <div class="mb-4">
-            <p class="text-center">Daily Generated</p>
-            <audio controls class="w-full">
-                <source src="/data/audio/{{ podcast_file }}" type="audio/mpeg">
-                Your browser does not support the audio element.
-            </audio>
-        </div>
-    {% else %}
-        <p class="text-center">No podcast available at the moment.</p>
-    {% endif %}
-</div>
-
-<!-- Search Container -->
-<div class="max-w-2xl mx-auto px-4 w-full">
-    <div id="search">
-        <input type="text" id="accountSearch" placeholder="Search for accounts or stocks..."
-            class="w-full p-3 mb-2 border-2 border-gray-300 rounded-md focus:border-blue-500 focus:outline-none transition-colors dark:bg-gray-800 dark:border-gray-600 dark:text-white">
-    </div>
-</div>
-
-
-
-<table class="w-full" id="rankings">
-    <thead class="hidden md:table-header-group">
-        <tr>
-            <th class="px-4 py-2">Rank</th>
-            <th class="px-4 py-2">Account</th>
-            <th class="hidden md:table-cell px-4 py-2">Account Value</th>
-            <th class="hidden md:table-cell px-4 py-2">Stocks Invested</th>
-            <th class="hidden md:table-cell px-4 py-2">Z-Score</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for row in row_data %}
-        <tr class="border-b {% if 'teachermiller' in row %}font-bold{% endif %}">
-            <!-- Mobile view -->
-            <td class="md:hidden">
-                <div class="flex items-center justify-between p-4">
-                    <div class="flex items-center space-x-4">
-                        <span class="text-sm">{{ row[0] }}</span>
-                        <span>{{ row[1] | safe }}</span>
-                    </div>
-                    <button class="collapsible-header bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 px-3 py-1 rounded-md text-sm">
-                        <span class="toggle-icon flex items-center">
-                            Details
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </span>
-                    </button>
-                </div>
-                <div class="collapsible-content px-4 py-2 bg-gray-50 dark:bg-gray-900">
-                    <p class="py-1"><span class="font-semibold">Account Value:</span> {{ row[2] }}</p>
-                    <p class="py-1"><span class="font-semibold">Stocks Invested:</span> {{ row[3] }}</p>
-                    <p class="py-1"><span class="font-semibold">Z-Score:</span> {{ row[4] }}</p>
-                </div>
-            </td>
-            <!-- Desktop view -->
-            <td class="hidden md:table-cell px-4 py-2">{{ row[0] }}</td>
-            <td class="hidden md:table-cell px-4 py-2">{{ row[1] | safe }}</td>
-            <td class="hidden md:table-cell px-4 py-2">{{ row[2] }}</td>
-            <td class="hidden md:table-cell px-4 py-2">{{ row[3] }}</td>
-            <td class="hidden md:table-cell px-4 py-2">{{ row[4] }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
 {% endblock %}
 
 {% block scripts %}
@@ -312,208 +361,242 @@
         });
     }
 
-    const chartContainer = document.getElementById('chartContainer');
-    const colors = getChartColors();
-    const chartOptions = {
-        width: chartContainer.offsetWidth,
-        height: chartContainer.offsetHeight,
-        layout: {
-            background: { type: 'solid', color: colors.background },
-            textColor: colors.text,
-            fontSize: 12,
-        },
-        grid: {
-            vertLines: { color: colors.grid },
-            horzLines: { color: colors.grid },
-        },
-        timeScale: {
-            timeVisible: true,
-            borderColor: colors.border,
-            rightOffset: 5,
-            barSpacing: 10,
-            fixLeftEdge: true,
-            fixRightEdge: true,
-            timeZone: 'America/Los_Angeles',  // Add this line
-        },
-        rightPriceScale: {
-            borderColor: colors.border,
-            autoScale: true,
-        },
-        watermark: {
-            color: 'rgba(0, 0, 0, 0)',
-        },
-        leftPriceScale: {
-            visible: false,
-        },
-        handleScale: {
-            mouseWheel: true,
-            pinch: true,
-            axisPressedMouseMove: true,
-        },
-        handleScroll: {
-            mouseWheel: true,
-            pressedMouseMove: true,
-            horzTouchDrag: true,
-            vertTouchDrag: true
-        },
-    };
+    // Wrap chart initialization in a function
+    function initializeChart() {
+        const chartContainer = document.getElementById('chart-container');
+        
+        if (!chartContainer) {
+            console.error('Chart container element not found');
+            return;
+        }
 
-    // Add color scheme change listener
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateChartColors);
-
-    const chart = LightweightCharts.createChart(document.getElementById('stockChart'), chartOptions);
-
-    const labels = {{ labels | safe }};
-    
-    // Define all series first
-    const sp500Series = chart.addAreaSeries({
-        lineColor: '#FF6384',
-        topColor: 'rgba(255, 99, 132, 0.4)',
-        bottomColor: 'rgba(255, 99, 132, 0.1)',
-        lineWidth: 2,
-    });
-    
-    const q1Series = chart.addAreaSeries({
-        lineColor: '#9966FF',
-        topColor: 'rgba(153, 102, 255, 0.4)',
-        bottomColor: 'rgba(153, 102, 255, 0.1)',
-        lineWidth: 2,
-    });
-
-    const medianSeries = chart.addAreaSeries({
-        lineColor: '#FFCE56',
-        topColor: 'rgba(255, 206, 86, 0.4)',
-        bottomColor: 'rgba(255, 206, 86, 0.1)',
-        lineWidth: 2,
-    });
-
-    const q3Series = chart.addAreaSeries({
-        lineColor: '#FF9F40',
-        topColor: 'rgba(255, 159, 64, 0.4)',
-        bottomColor: 'rgba(255, 159, 64, 0.1)',
-        lineWidth: 2,
-    });
-
-    const minSeries = chart.addAreaSeries({
-        lineColor: '#4BC0C0',
-        topColor: 'rgba(75, 192, 192, 0.4)',
-        bottomColor: 'rgba(75, 192, 192, 0.1)',
-        lineWidth: 2,
-        visible: false,  // Add this line
-    });
-
-    const maxSeries = chart.addAreaSeries({
-        lineColor: '#36A2EB',
-        topColor: 'rgba(54, 162, 235, 0.4)',
-        bottomColor: 'rgba(54, 162, 235, 0.1)',
-        lineWidth: 2,
-        visible: false,  // Add this line
-    });
-
-    // Create and process data with proper timestamps
-    const sp500Data = labels.map((timeStr, i) => {
-        const date = new Date(timeStr);
-        // Convert to PST
-        const pstDate = convertTZ(date, 'America/Los_Angeles');
-        return {
-            time: Math.floor(pstDate.getTime() / 1000),
-            value: {{ sp500_prices | safe }}[i] || 0
-        };
-    }).filter(item => item.value !== 0);
-
-    const q1Data = labels.map((timeStr, i) => {
-        const date = new Date(timeStr);
-        // Convert to PST
-        const pstDate = convertTZ(date, 'America/Los_Angeles');
-        return {
-            time: Math.floor(pstDate.getTime() / 1000),
-            value: {{ q1_monies | safe }}[i] || 0
-        };
-    }).filter(item => item.value !== 0);
-
-    const medianData = labels.map((timeStr, i) => {
-        const date = new Date(timeStr);
-        // Convert to PST
-        const pstDate = convertTZ(date, 'America/Los_Angeles');
-        return {
-            time: Math.floor(pstDate.getTime() / 1000),
-            value: {{ median_monies | safe }}[i] || 0
-        };
-    }).filter(item => item.value !== 0);
-
-    const q3Data = labels.map((timeStr, i) => {
-        const date = new Date(timeStr);
-        // Convert to PST
-        const pstDate = convertTZ(date, 'America/Los_Angeles');
-        return {
-            time: Math.floor(pstDate.getTime() / 1000),
-            value: {{ q3_monies | safe }}[i] || 0
-        };
-    }).filter(item => item.value !== 0);
-
-    const minData = labels.map((timeStr, i) => {
-        const date = new Date(timeStr);
-        const pstDate = convertTZ(date, 'America/Los_Angeles');
-        return {
-            time: Math.floor(pstDate.getTime() / 1000),
-            value: {{ min_monies | safe }}[i] || 0
-        };
-    }).filter(item => item.value !== 0);
-
-    const maxData = labels.map((timeStr, i) => {
-        const date = new Date(timeStr);
-        const pstDate = convertTZ(date, 'America/Los_Angeles');
-        return {
-            time: Math.floor(pstDate.getTime() / 1000),
-            value: {{ max_monies | safe }}[i] || 0
-        };
-    }).filter(item => item.value !== 0);
-
-    // Sort all data arrays
-    sp500Data.sort((a, b) => a.time - b.time);
-    q1Data.sort((a, b) => a.time - b.time);
-    medianData.sort((a, b) => a.time - b.time);
-    q3Data.sort((a, b) => a.time - b.time);
-    minData.sort((a, b) => a.time - b.time);
-    maxData.sort((a, b) => a.time - b.time);
-
-    sp500Series.setData(sp500Data);
-    q1Series.setData(q1Data);
-    medianSeries.setData(medianData);
-    q3Series.setData(q3Data);
-    minSeries.setData(minData);
-    maxSeries.setData(maxData);
-
-    chart.timeScale().fitContent();
-
-    window.addEventListener('resize', () => {
-        chart.applyOptions({
+        const colors = getChartColors();
+        const chartOptions = {
             width: chartContainer.offsetWidth,
-            height: chartContainer.offsetHeight
-        });
-    });
+            height: chartContainer.offsetHeight,
+            layout: {
+                background: { type: 'solid', color: colors.background },
+                textColor: colors.text,
+                fontSize: 12,
+            },
+            grid: {
+                vertLines: { color: colors.grid },
+                horzLines: { color: colors.grid },
+            },
+            timeScale: {
+                timeVisible: true,
+                borderColor: colors.border,
+                rightOffset: 5,
+                barSpacing: 10,
+                fixLeftEdge: true,
+                fixRightEdge: true,
+                timeZone: 'America/Los_Angeles',  // Add this line
+            },
+            rightPriceScale: {
+                borderColor: colors.border,
+                autoScale: true,
+            },
+            watermark: {
+                color: 'rgba(0, 0, 0, 0)',
+            },
+            leftPriceScale: {
+                visible: false,
+            },
+            handleScale: {
+                mouseWheel: true,
+                pinch: true,
+                axisPressedMouseMove: true,
+            },
+            handleScroll: {
+                mouseWheel: true,
+                pressedMouseMove: true,
+                horzTouchDrag: true,
+                vertTouchDrag: true
+            },
+        };
 
-    // Update reset zoom handler
-    document.getElementById('resetZoom').addEventListener('click', () => {
+        // Add color scheme change listener
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateChartColors);
+
+        const chart = LightweightCharts.createChart(document.getElementById('stockChart'), chartOptions);
+
+        const labels = {{ labels | safe }};
+        
+        // Define all series first
+        const sp500Series = chart.addAreaSeries({
+            lineColor: '#FF6384',
+            topColor: 'rgba(255, 99, 132, 0.4)',
+            bottomColor: 'rgba(255, 99, 132, 0.1)',
+            lineWidth: 2,
+        });
+        
+        const q1Series = chart.addAreaSeries({
+            lineColor: '#9966FF',
+            topColor: 'rgba(153, 102, 255, 0.4)',
+            bottomColor: 'rgba(153, 102, 255, 0.1)',
+            lineWidth: 2,
+        });
+
+        const medianSeries = chart.addAreaSeries({
+            lineColor: '#FFCE56',
+            topColor: 'rgba(255, 206, 86, 0.4)',
+            bottomColor: 'rgba(255, 206, 86, 0.1)',
+            lineWidth: 2,
+        });
+
+        const q3Series = chart.addAreaSeries({
+            lineColor: '#FF9F40',
+            topColor: 'rgba(255, 159, 64, 0.4)',
+            bottomColor: 'rgba(255, 159, 64, 0.1)',
+            lineWidth: 2,
+        });
+
+        const minSeries = chart.addAreaSeries({
+            lineColor: '#4BC0C0',
+            topColor: 'rgba(75, 192, 192, 0.4)',
+            bottomColor: 'rgba(75, 192, 192, 0.1)',
+            lineWidth: 2,
+            visible: false,  // Add this line
+        });
+
+        const maxSeries = chart.addAreaSeries({
+            lineColor: '#36A2EB',
+            topColor: 'rgba(54, 162, 235, 0.4)',
+            bottomColor: 'rgba(54, 162, 235, 0.1)',
+            lineWidth: 2,
+            visible: false,  // Add this line
+        });
+
+        // Create and process data with proper timestamps
+        const sp500Data = labels.map((timeStr, i) => {
+            const date = new Date(timeStr);
+            // Convert to PST
+            const pstDate = convertTZ(date, 'America/Los_Angeles');
+            return {
+                time: Math.floor(pstDate.getTime() / 1000),
+                value: {{ sp500_prices | safe }}[i] || 0
+            };
+        }).filter(item => item.value !== 0);
+
+        const q1Data = labels.map((timeStr, i) => {
+            const date = new Date(timeStr);
+            // Convert to PST
+            const pstDate = convertTZ(date, 'America/Los_Angeles');
+            return {
+                time: Math.floor(pstDate.getTime() / 1000),
+                value: {{ q1_monies | safe }}[i] || 0
+            };
+        }).filter(item => item.value !== 0);
+
+        const medianData = labels.map((timeStr, i) => {
+            const date = new Date(timeStr);
+            // Convert to PST
+            const pstDate = convertTZ(date, 'America/Los_Angeles');
+            return {
+                time: Math.floor(pstDate.getTime() / 1000),
+                value: {{ median_monies | safe }}[i] || 0
+            };
+        }).filter(item => item.value !== 0);
+
+        const q3Data = labels.map((timeStr, i) => {
+            const date = new Date(timeStr);
+            // Convert to PST
+            const pstDate = convertTZ(date, 'America/Los_Angeles');
+            return {
+                time: Math.floor(pstDate.getTime() / 1000),
+                value: {{ q3_monies | safe }}[i] || 0
+            };
+        }).filter(item => item.value !== 0);
+
+        const minData = labels.map((timeStr, i) => {
+            const date = new Date(timeStr);
+            const pstDate = convertTZ(date, 'America/Los_Angeles');
+            return {
+                time: Math.floor(pstDate.getTime() / 1000),
+                value: {{ min_monies | safe }}[i] || 0
+            };
+        }).filter(item => item.value !== 0);
+
+        const maxData = labels.map((timeStr, i) => {
+            const date = new Date(timeStr);
+            const pstDate = convertTZ(date, 'America/Los_Angeles');
+            return {
+                time: Math.floor(pstDate.getTime() / 1000),
+                value: {{ max_monies | safe }}[i] || 0
+            };
+        }).filter(item => item.value !== 0);
+
+        // Sort all data arrays
+        sp500Data.sort((a, b) => a.time - b.time);
+        q1Data.sort((a, b) => a.time - b.time);
+        medianData.sort((a, b) => a.time - b.time);
+        q3Data.sort((a, b) => a.time - b.time);
+        minData.sort((a, b) => a.time - b.time);
+        maxData.sort((a, b) => a.time - b.time);
+
+        sp500Series.setData(sp500Data);
+        q1Series.setData(q1Data);
+        medianSeries.setData(medianData);
+        q3Series.setData(q3Data);
+        minSeries.setData(minData);
+        maxSeries.setData(maxData);
+
         chart.timeScale().fitContent();
-        chart.priceScale('right').applyOptions({
-            autoScale: true
-        });
-    });
 
-    // Add time range functionality
-    document.querySelectorAll('.time-range').forEach(button => {
-        button.addEventListener('click', () => {
-            const days = parseInt(button.dataset.days);
-            const now = Math.floor(Date.now() / 1000);
-            const start = now - (days * 24 * 60 * 60);
-            
-            chart.timeScale().setVisibleRange({
-                from: start,
-                to: now,
+        window.addEventListener('resize', () => {
+            chart.applyOptions({
+                width: chartContainer.offsetWidth,
+                height: chartContainer.offsetHeight
             });
         });
-    });
+
+        // Update reset zoom handler
+        document.getElementById('resetZoom').addEventListener('click', () => {
+            chart.timeScale().fitContent();
+            chart.priceScale('right').applyOptions({
+                autoScale: true
+            });
+        });
+
+        // Add time range functionality
+        document.querySelectorAll('.time-range').forEach(button => {
+            button.addEventListener('click', () => {
+                const days = parseInt(button.dataset.days);
+                const now = Math.floor(Date.now() / 1000);
+                const start = now - (days * 24 * 60 * 60);
+                
+                chart.timeScale().setVisibleRange({
+                    from: start,
+                    to: now,
+                });
+            });
+        });
+
+        // Store series in an object for easy access
+        const series = {
+            sp500: sp500Series,
+            q1: q1Series,
+            median: medianSeries,
+            q3: q3Series,
+            min: minSeries,
+            max: maxSeries
+        };
+
+        // Replace button toggle functionality with legend toggle
+        document.querySelectorAll('.legend-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const seriesName = item.dataset.series;
+                item.classList.toggle('active');
+                const isVisible = item.classList.contains('active');
+                series[seriesName].applyOptions({
+                    visible: isVisible
+                });
+            });
+        });
+    }
+
+    // Call the initialization function when DOM is loaded
+    document.addEventListener('DOMContentLoaded', initializeChart);
 
     // get the input element
     const searchInput = document.getElementById('accountSearch');
@@ -569,28 +652,6 @@
                 // Toggle current section
                 content.classList.toggle('active');
                 icon.classList.toggle('active');
-            });
-        });
-    });
-
-    // Store series in an object for easy access
-    const series = {
-        sp500: sp500Series,
-        q1: q1Series,
-        median: medianSeries,
-        q3: q3Series,
-        min: minSeries,
-        max: maxSeries
-    };
-
-    // Replace button toggle functionality with legend toggle
-    document.querySelectorAll('.legend-item').forEach(item => {
-        item.addEventListener('click', () => {
-            const seriesName = item.dataset.series;
-            item.classList.toggle('active');
-            const isVisible = item.classList.contains('active');
-            series[seriesName].applyOptions({
-                visible: isVisible
             });
         });
     });
