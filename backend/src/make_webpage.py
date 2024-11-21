@@ -636,6 +636,73 @@ def make_user_pages(usernames):
                     f.write(rendered)
 
 
+def make_combined_chart():
+    """Generate a page showing all players' performance on one chart"""
+    with app.app_context():
+        leaderboard_files = sorted(glob("./backend/leaderboards/in_time/*"))
+        labels = []
+        all_data = {}
+
+        # Process each leaderboard file
+        for file in leaderboard_files:
+            file_name = os.path.basename(file)
+            date_time_str = file_name[len("leaderboard-") : -len(".json")]
+            date_time = datetime.strptime(
+                date_time_str.replace("_", ":"), "%Y-%m-%d-%H:%M"
+            )
+            labels.append(date_time.strftime("%Y-%m-%dT%H:%M:%S"))
+
+            # Load and process the leaderboard data
+            with open(file, "r") as f:
+                dict_leaderboard = json.load(f)
+
+            for player, data in dict_leaderboard.items():
+                if player not in all_data:
+                    all_data[player] = []
+                # Fix: data is a list where the first element is the account value
+                money = float(str(data[0]).replace("$", "").replace(",", ""))
+                all_data[player].append(money)
+
+        # Create datasets for Chart.js
+        colors = [
+            "#FF6384",
+            "#36A2EB",
+            "#FFCE56",
+            "#4BC0C0",
+            "#9966FF",
+            "#FF9F40",
+            "#00FF00",
+            "#C9CBCF",
+            "#4B0082",
+            "#800000",
+            "#FFB6C1",
+            "#00CED1",
+            "#FF4500",
+            "#32CD32",
+            "#BA55D3",
+        ]
+
+        datasets = []
+        for idx, (player, values) in enumerate(all_data.items()):
+            color = colors[idx % len(colors)]
+            datasets.append(
+                {
+                    "label": player,
+                    "data": values,
+                    "borderColor": color,
+                    "backgroundColor": color,
+                    "fill": False,
+                    "tension": 0.1,
+                }
+            )
+
+        # Render template
+        rendered = render_template(
+            "cometogether.html", labels=labels, datasets=datasets
+        )
+        return rendered
+
+
 def make_about_page():
     """Generate the about page HTML"""
     with app.app_context():
@@ -647,3 +714,6 @@ if __name__ == "__main__":
     with app.app_context():
         ### This whole section makes the chart shown at the top of the page!
         print(make_index_page())
+        # Generate the combined chart page
+        with open("cometogether.html", "w") as f:
+            f.write(make_combined_chart())

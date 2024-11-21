@@ -9,7 +9,12 @@ import time
 
 import pytz
 from dotenv import load_dotenv
-from make_webpage import make_index_page, make_user_pages, make_about_page
+from make_webpage import (
+    make_index_page,
+    make_user_pages,
+    make_about_page,
+    make_combined_chart,
+)
 from make_podcast import generate_podcast_audio
 
 load_dotenv()
@@ -281,6 +286,10 @@ async def main():
         # Update about.html
         with open("about.html", "w") as file:
             file.write(make_about_page())
+
+        # Generate combined chart page
+        with open("cometogether.html", "w") as file:
+            file.write(make_combined_chart())
 
         # Read usernames and generate all pages at once
         with open("./backend/portfolios/usernames.txt", "r") as file:
