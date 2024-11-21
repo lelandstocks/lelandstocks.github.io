@@ -57,7 +57,6 @@
         border-radius: 0.5rem;
         box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         padding: 1.5rem;
-        height: 100%;
     }
 
     .chart-wrapper {
@@ -66,6 +65,7 @@
         box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         padding: 1.5rem;
         margin-bottom: 2rem;
+        max-height: 550px;  /* Increased from 500px */
     }
 
     /* Dark mode updates */
@@ -82,7 +82,8 @@
 
     /* Keep only chart and search styles */
     .chart-container {
-        min-height: 300px;
+        min-height: 350px;  /* Increased from 300px */
+        max-height: 450px;  /* Increased from 400px */
         display: flex;
         align-items: stretch;
     }
@@ -219,7 +220,7 @@
 <div class="page-header">
     <div class="container mx-auto px-4">
         <h1 class="text-4xl font-bold text-center mb-2">Quicksilver Stock Exchange</h1>
-        <p class="text-center text-lg opacity-90">Last updated 20:05:13 11-20-2024</p>
+        <p class="text-center text-lg opacity-90">Last updated 20:43:23 11-20-2024</p>
         <p class="text-center mt-2">
             <a href="https://github.com/lelandstocks/lelandstocks.github.io" 
                class="inline-flex items-center text-white hover:text-gray-200">
@@ -234,8 +235,9 @@
 
 <div class="container mx-auto px-4">
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <!-- Main chart section -->
-        <div class="lg:col-span-8">
+        <!-- Left side: Chart and Podcast -->
+        <div class="lg:col-span-8 space-y-6">
+            <!-- Chart section -->
             <div class="chart-wrapper">
                 <div class="legend flex justify-center mb-4 space-x-4">
                     <div class="legend-item cursor-pointer" data-series="min">
@@ -257,7 +259,7 @@
                         <span class="legend-color" style="background: #FF6384"></span>S&P 500
                     </div>
                 </div>
-                <div class="flex-grow chart-container" id="chart-container">
+                <div class="flex-grow chart-container" id="chart-container" style="height: 400px;">
                     <div id="stockChart"></div>
                 </div>
                 <div class="text-center mt-4 space-x-2">
@@ -268,9 +270,23 @@
                     <button class="uk-button uk-button-default time-range" data-days="365">1Y</button>
                 </div>
             </div>
+
+            <!-- Podcast section moved here -->
+            <div class="stats-card">
+                <h2 class="text-xl font-semibold mb-4 text-center">Daily Market Update</h2>
+                
+                    <div class="mb-4">
+                        <p class="text-center">Daily Generated</p>
+                        <audio controls class="w-full">
+                            <source src="/data/audio/podcast_978f3261ea474aa7a3200b6183965ad4.mp3" type="audio/mpeg">
+                            Your browser does not support the audio element.
+                        </audio>
+                    </div>
+                
+            </div>
         </div>
 
-        <!-- Stats section -->
+        <!-- Right side: Stats -->
         <div class="lg:col-span-4 grid gap-6">
             <div class="stats-card">
                 <h2 class="text-xl font-semibold mb-4">Summary Statistics</h2>
@@ -1483,22 +1499,6 @@
                     </table>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <!-- Podcast section -->
-    <div class="my-8">
-        <div class="stats-card max-w-2xl mx-auto">
-            <h2 class="text-xl font-semibold mb-4 text-center">Daily Market Update</h2>
-            
-                <div class="mb-4">
-                    <p class="text-center">Daily Generated</p>
-                    <audio controls class="w-full">
-                        <source src="/data/audio/podcast_978f3261ea474aa7a3200b6183965ad4.mp3" type="audio/mpeg">
-                        Your browser does not support the audio element.
-                    </audio>
-                </div>
-            
         </div>
     </div>
 
