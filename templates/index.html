@@ -208,9 +208,15 @@
 
         <!-- Right side: Stats -->
         <div class="lg:col-span-4 grid gap-6">
+            <!-- Summary Statistics -->
             <div class="stats-card">
-                <h2 class="text-xl font-semibold mb-4">Summary Statistics</h2>
-                <div class="space-y-3">
+                <div class="flex justify-between items-center mb-4 cursor-pointer md:cursor-default" id="summaryHeader">
+                    <h2 class="text-xl font-semibold">Summary Statistics</h2>
+                    <svg class="w-6 h-6 md:hidden transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </div>
+                <div class="space-y-3 hidden md:block" id="summaryContent">
                     <div class="flex justify-between">
                         <span>Miller Tracker</span>
                         <span class="font-medium">#{{ miller_location }}th place</span>
@@ -238,9 +244,15 @@
                 </div>
             </div>
             
+            <!-- Popular Stocks -->
             <div class="stats-card">
-                <h2 class="text-xl font-semibold mb-4">Popular Stocks</h2>
-                <div class="max-h-[300px] overflow-y-auto">
+                <div class="flex justify-between items-center mb-4 cursor-pointer md:cursor-default" id="stocksHeader">
+                    <h2 class="text-xl font-semibold">Popular Stocks</h2>
+                    <svg class="w-6 h-6 md:hidden transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </div>
+                <div class="max-h-[300px] overflow-y-auto hidden md:block" id="stocksContent">
                     <table class="uk-table uk-table-striped uk-table-responsive">
                         <thead>
                             <tr>
@@ -655,5 +667,57 @@
             });
         });
     });
+
+    // Add mobile collapsible functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add these styles dynamically
+        const style = document.createElement('style');
+        style.textContent = `
+            @media (max-width: 768px) {
+                .rotate-180 {
+                    transform: rotate(180deg);
+                }
+                
+                .collapse-active {
+                    display: block !important;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        function setupCollapsible(headerId, contentId) {
+            const header = document.getElementById(headerId);
+            const content = document.getElementById(contentId);
+            const arrow = header.querySelector('svg');
+
+            if (window.innerWidth < 768) {
+                header.addEventListener('click', () => {
+                    content.classList.toggle('collapse-active');
+                    arrow.classList.toggle('rotate-180');
+                });
+            }
+        }
+
+        setupCollapsible('summaryHeader', 'summaryContent');
+        setupCollapsible('stocksHeader', 'stocksContent');
+
+        // Update visibility on resize
+        window.addEventListener('resize', () => {
+            const contents = document.querySelectorAll('#summaryContent, #stocksContent');
+            if (window.innerWidth >= 768) {
+                contents.forEach(content => {
+                    content.classList.remove('hidden');
+                    content.classList.add('block');
+                });
+            } else {
+                contents.forEach(content => {
+                    if (!content.classList.contains('collapse-active')) {
+                        content.classList.add('hidden');
+                    }
+                });
+            }
+        });
+    });
+
 </script>
 {% endblock %}
