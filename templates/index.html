@@ -258,13 +258,21 @@
                             <tr>
                                 <th>Stock</th>
                                 <th>Count</th>
+                                <th>Current Value</th>
+                                <th>Initial Value</th>
+                                <th>Return</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for stock, count in stock_cnt %}
+                            {% for stock, count, current, initial, pct in stock_cnt %}
                             <tr>
                                 <td>{{ stock }}</td>
                                 <td>{{ count }}</td>
+                                <td>${{ '{:,.2f}'.format(current) }}</td>
+                                <td>${{ '{:,.2f}'.format(initial) }}</td>
+                                <td class="{% if pct >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                    {{ '{:+.1f}%'.format(pct) }}
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>

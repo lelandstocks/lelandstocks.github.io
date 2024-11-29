@@ -220,7 +220,7 @@
 <div class="page-header">
     <div class="container mx-auto px-4">
         <h1 class="text-4xl font-bold text-center mb-2">Quicksilver Stock Exchange</h1>
-        <p class="text-center text-lg opacity-90">Last updated 13:46:50 11-29-2024</p>
+        <p class="text-center text-lg opacity-90">Last updated 14:55:40 11-29-2024</p>
         <p class="text-center mt-2">
             <a href="https://github.com/lelandstocks/lelandstocks.github.io" 
                class="inline-flex items-center text-white hover:text-gray-200">
@@ -338,6 +338,9 @@
                             <tr>
                                 <th>Stock</th>
                                 <th>Count</th>
+                                <th>Current Value</th>
+                                <th>Initial Value</th>
+                                <th>Return</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -345,1146 +348,2291 @@
                             <tr>
                                 <td>NVDA</td>
                                 <td>60</td>
+                                <td>$827,288.00</td>
+                                <td>$781,201.13</td>
+                                <td class="text-success">
+                                    +5.9%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>AAPL</td>
                                 <td>43</td>
+                                <td>$438,585.84</td>
+                                <td>$414,622.72</td>
+                                <td class="text-success">
+                                    +5.8%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>AMZN</td>
                                 <td>35</td>
+                                <td>$325,347.85</td>
+                                <td>$294,454.89</td>
+                                <td class="text-success">
+                                    +10.5%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>MSFT</td>
                                 <td>22</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>COST</td>
-                                <td>20</td>
+                                <td>$177,429.74</td>
+                                <td>$176,930.72</td>
+                                <td class="text-success">
+                                    +0.3%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>TSLA</td>
                                 <td>20</td>
+                                <td>$259,905.48</td>
+                                <td>$199,235.82</td>
+                                <td class="text-success">
+                                    +30.5%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>COST</td>
+                                <td>20</td>
+                                <td>$251,716.92</td>
+                                <td>$232,337.99</td>
+                                <td class="text-success">
+                                    +8.3%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>AMD</td>
                                 <td>13</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>WMT</td>
-                                <td>11</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>LULU</td>
-                                <td>11</td>
+                                <td>$195,200.04</td>
+                                <td>$218,214.80</td>
+                                <td class="text-danger">
+                                    -10.5%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>NFLX</td>
                                 <td>11</td>
+                                <td>$175,588.38</td>
+                                <td>$167,527.92</td>
+                                <td class="text-success">
+                                    +4.8%
+                                </td>
                             </tr>
                             
                             <tr>
-                                <td>GOOG</td>
-                                <td>9</td>
+                                <td>WMT</td>
+                                <td>11</td>
+                                <td>$71,595.00</td>
+                                <td>$62,745.19</td>
+                                <td class="text-success">
+                                    +14.1%
+                                </td>
                             </tr>
                             
                             <tr>
-                                <td>QQQ</td>
-                                <td>9</td>
+                                <td>LULU</td>
+                                <td>11</td>
+                                <td>$101,969.88</td>
+                                <td>$86,087.76</td>
+                                <td class="text-success">
+                                    +18.4%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>SPOT</td>
                                 <td>9</td>
+                                <td>$77,267.52</td>
+                                <td>$60,221.42</td>
+                                <td class="text-success">
+                                    +28.3%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>QQQ</td>
+                                <td>9</td>
+                                <td>$135,081.10</td>
+                                <td>$124,860.53</td>
+                                <td class="text-success">
+                                    +8.2%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>GOOG</td>
+                                <td>9</td>
+                                <td>$52,510.92</td>
+                                <td>$50,841.14</td>
+                                <td class="text-success">
+                                    +3.3%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>ADBE</td>
                                 <td>8</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>LLY</td>
-                                <td>8</td>
+                                <td>$67,586.83</td>
+                                <td>$68,914.90</td>
+                                <td class="text-danger">
+                                    -1.9%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>JPM</td>
                                 <td>8</td>
+                                <td>$80,409.84</td>
+                                <td>$69,865.32</td>
+                                <td class="text-success">
+                                    +15.1%
+                                </td>
                             </tr>
                             
                             <tr>
-                                <td>AVGO</td>
-                                <td>7</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>PLTR</td>
-                                <td>7</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>DUOL</td>
-                                <td>7</td>
+                                <td>LLY</td>
+                                <td>8</td>
+                                <td>$66,014.05</td>
+                                <td>$74,484.30</td>
+                                <td class="text-danger">
+                                    -11.4%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>SPY</td>
                                 <td>7</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>META</td>
-                                <td>7</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>TGT</td>
-                                <td>7</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>DIS</td>
-                                <td>7</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>INTC</td>
-                                <td>7</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>GOOGL</td>
-                                <td>7</td>
+                                <td>$130,150.80</td>
+                                <td>$121,754.26</td>
+                                <td class="text-success">
+                                    +6.9%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>SBUX</td>
                                 <td>7</td>
+                                <td>$32,582.28</td>
+                                <td>$29,722.65</td>
+                                <td class="text-success">
+                                    +9.6%
+                                </td>
                             </tr>
                             
                             <tr>
-                                <td>LUNR</td>
-                                <td>6</td>
+                                <td>INTC</td>
+                                <td>7</td>
+                                <td>$20,562.75</td>
+                                <td>$19,851.83</td>
+                                <td class="text-success">
+                                    +3.6%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>DUOL</td>
+                                <td>7</td>
+                                <td>$53,285.31</td>
+                                <td>$46,915.37</td>
+                                <td class="text-success">
+                                    +13.6%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>PLTR</td>
+                                <td>7</td>
+                                <td>$103,370.28</td>
+                                <td>$66,071.27</td>
+                                <td class="text-success">
+                                    +56.5%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>GOOGL</td>
+                                <td>7</td>
+                                <td>$29,904.15</td>
+                                <td>$29,253.86</td>
+                                <td class="text-success">
+                                    +2.2%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>AVGO</td>
+                                <td>7</td>
+                                <td>$70,828.96</td>
+                                <td>$72,861.65</td>
+                                <td class="text-danger">
+                                    -2.8%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>TGT</td>
+                                <td>7</td>
+                                <td>$55,173.27</td>
+                                <td>$59,537.72</td>
+                                <td class="text-danger">
+                                    -7.3%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>META</td>
+                                <td>7</td>
+                                <td>$45,371.28</td>
+                                <td>$42,320.38</td>
+                                <td class="text-success">
+                                    +7.2%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>DIS</td>
+                                <td>7</td>
+                                <td>$46,283.18</td>
+                                <td>$38,851.81</td>
+                                <td class="text-success">
+                                    +19.1%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>RDDT</td>
                                 <td>6</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>NKE</td>
-                                <td>6</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>BRK.B</td>
-                                <td>6</td>
+                                <td>$56,979.45</td>
+                                <td>$29,296.44</td>
+                                <td class="text-success">
+                                    +94.5%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>TQQQ</td>
                                 <td>6</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>CRWD</td>
-                                <td>6</td>
+                                <td>$248,537.79</td>
+                                <td>$231,564.67</td>
+                                <td class="text-success">
+                                    +7.3%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>MCD</td>
                                 <td>6</td>
+                                <td>$60,682.05</td>
+                                <td>$59,074.56</td>
+                                <td class="text-success">
+                                    +2.7%
+                                </td>
                             </tr>
                             
                             <tr>
-                                <td>ASML</td>
-                                <td>5</td>
+                                <td>BRK.B</td>
+                                <td>6</td>
+                                <td>$81,630.38</td>
+                                <td>$76,392.63</td>
+                                <td class="text-success">
+                                    +6.9%
+                                </td>
                             </tr>
                             
                             <tr>
-                                <td>BAC</td>
-                                <td>5</td>
+                                <td>CRWD</td>
+                                <td>6</td>
+                                <td>$92,719.96</td>
+                                <td>$76,153.44</td>
+                                <td class="text-success">
+                                    +21.8%
+                                </td>
                             </tr>
                             
                             <tr>
-                                <td>EA</td>
-                                <td>5</td>
+                                <td>NKE</td>
+                                <td>6</td>
+                                <td>$24,024.85</td>
+                                <td>$24,934.62</td>
+                                <td class="text-danger">
+                                    -3.6%
+                                </td>
                             </tr>
                             
                             <tr>
-                                <td>SPGI</td>
-                                <td>5</td>
+                                <td>LUNR</td>
+                                <td>6</td>
+                                <td>$299,924.40</td>
+                                <td>$187,134.97</td>
+                                <td class="text-success">
+                                    +60.3%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>WOK</td>
                                 <td>5</td>
+                                <td>$7,444.67</td>
+                                <td>$5,272.27</td>
+                                <td class="text-success">
+                                    +41.2%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>GE</td>
                                 <td>5</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>RBLX</td>
-                                <td>5</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>HD</td>
-                                <td>5</td>
+                                <td>$25,138.08</td>
+                                <td>$23,732.21</td>
+                                <td class="text-success">
+                                    +5.9%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>CSCO</td>
                                 <td>5</td>
+                                <td>$30,137.89</td>
+                                <td>$26,229.86</td>
+                                <td class="text-success">
+                                    +14.9%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>EA</td>
+                                <td>5</td>
+                                <td>$22,913.80</td>
+                                <td>$20,697.36</td>
+                                <td class="text-success">
+                                    +10.7%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>HD</td>
+                                <td>5</td>
+                                <td>$29,609.97</td>
+                                <td>$25,946.68</td>
+                                <td class="text-success">
+                                    +14.1%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>ASML</td>
+                                <td>5</td>
+                                <td>$67,974.39</td>
+                                <td>$74,241.37</td>
+                                <td class="text-danger">
+                                    -8.4%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>BAC</td>
+                                <td>5</td>
+                                <td>$28,410.98</td>
+                                <td>$23,983.88</td>
+                                <td class="text-success">
+                                    +18.5%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>SPGI</td>
+                                <td>5</td>
+                                <td>$57,476.10</td>
+                                <td>$55,781.76</td>
+                                <td class="text-success">
+                                    +3.0%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>VOO</td>
                                 <td>5</td>
+                                <td>$152,752.20</td>
+                                <td>$142,620.28</td>
+                                <td class="text-success">
+                                    +7.1%
+                                </td>
                             </tr>
                             
                             <tr>
-                                <td>CMG</td>
-                                <td>4</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>UBER</td>
-                                <td>4</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>BA</td>
-                                <td>4</td>
+                                <td>RBLX</td>
+                                <td>5</td>
+                                <td>$49,478.31</td>
+                                <td>$46,071.86</td>
+                                <td class="text-success">
+                                    +7.4%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>LB</td>
                                 <td>4</td>
+                                <td>$22,572.00</td>
+                                <td>$12,485.24</td>
+                                <td class="text-success">
+                                    +80.8%
+                                </td>
                             </tr>
                             
                             <tr>
-                                <td>V</td>
+                                <td>CMG</td>
                                 <td>4</td>
+                                <td>$36,173.76</td>
+                                <td>$31,115.08</td>
+                                <td class="text-success">
+                                    +16.3%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>ULTA</td>
                                 <td>4</td>
+                                <td>$27,451.44</td>
+                                <td>$26,626.67</td>
+                                <td class="text-success">
+                                    +3.1%
+                                </td>
                             </tr>
                             
                             <tr>
-                                <td>MSTR</td>
-                                <td>3</td>
+                                <td>V</td>
+                                <td>4</td>
+                                <td>$22,055.60</td>
+                                <td>$19,499.55</td>
+                                <td class="text-success">
+                                    +13.1%
+                                </td>
                             </tr>
                             
                             <tr>
-                                <td>TMUS</td>
-                                <td>3</td>
+                                <td>BA</td>
+                                <td>4</td>
+                                <td>$72,745.92</td>
+                                <td>$69,419.43</td>
+                                <td class="text-success">
+                                    +4.8%
+                                </td>
                             </tr>
                             
                             <tr>
-                                <td>ABNB</td>
-                                <td>3</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>LMT</td>
-                                <td>3</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>APP</td>
-                                <td>3</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>DJT</td>
-                                <td>3</td>
+                                <td>UBER</td>
+                                <td>4</td>
+                                <td>$13,096.72</td>
+                                <td>$13,377.87</td>
+                                <td class="text-danger">
+                                    -2.1%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>CAVA</td>
                                 <td>3</td>
+                                <td>$14,090.00</td>
+                                <td>$11,849.02</td>
+                                <td class="text-success">
+                                    +18.9%
+                                </td>
                             </tr>
                             
                             <tr>
-                                <td>PANW</td>
+                                <td>LMT</td>
                                 <td>3</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>SMCI</td>
-                                <td>3</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>SHOP</td>
-                                <td>3</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>F</td>
-                                <td>3</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>ORCL</td>
-                                <td>3</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>TT</td>
-                                <td>3</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>JNJ</td>
-                                <td>3</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>TSM</td>
-                                <td>3</td>
+                                <td>$20,646.99</td>
+                                <td>$21,941.82</td>
+                                <td class="text-danger">
+                                    -5.9%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>NOC</td>
                                 <td>3</td>
+                                <td>$28,399.70</td>
+                                <td>$30,004.13</td>
+                                <td class="text-danger">
+                                    -5.3%
+                                </td>
                             </tr>
                             
                             <tr>
-                                <td>NVDL</td>
-                                <td>2</td>
+                                <td>TSM</td>
+                                <td>3</td>
+                                <td>$24,929.10</td>
+                                <td>$23,322.68</td>
+                                <td class="text-success">
+                                    +6.9%
+                                </td>
                             </tr>
                             
                             <tr>
-                                <td>RKLB</td>
-                                <td>2</td>
+                                <td>TMUS</td>
+                                <td>3</td>
+                                <td>$21,236.84</td>
+                                <td>$17,800.69</td>
+                                <td class="text-success">
+                                    +19.3%
+                                </td>
                             </tr>
                             
                             <tr>
-                                <td>ANF</td>
-                                <td>2</td>
+                                <td>SHOP</td>
+                                <td>3</td>
+                                <td>$38,148.00</td>
+                                <td>$23,724.94</td>
+                                <td class="text-success">
+                                    +60.8%
+                                </td>
                             </tr>
                             
                             <tr>
-                                <td>ASTS</td>
-                                <td>2</td>
+                                <td>MSTR</td>
+                                <td>3</td>
+                                <td>$168,161.98</td>
+                                <td>$143,571.48</td>
+                                <td class="text-success">
+                                    +17.1%
+                                </td>
                             </tr>
                             
                             <tr>
-                                <td>ADMA</td>
-                                <td>2</td>
+                                <td>ABNB</td>
+                                <td>3</td>
+                                <td>$11,569.35</td>
+                                <td>$10,190.72</td>
+                                <td class="text-success">
+                                    +13.5%
+                                </td>
                             </tr>
                             
                             <tr>
-                                <td>VZ</td>
-                                <td>2</td>
+                                <td>ORCL</td>
+                                <td>3</td>
+                                <td>$21,256.60</td>
+                                <td>$16,466.98</td>
+                                <td class="text-success">
+                                    +29.1%
+                                </td>
                             </tr>
                             
                             <tr>
-                                <td>CVS</td>
-                                <td>2</td>
+                                <td>APP</td>
+                                <td>3</td>
+                                <td>$17,511.00</td>
+                                <td>$12,724.58</td>
+                                <td class="text-success">
+                                    +37.6%
+                                </td>
                             </tr>
                             
                             <tr>
-                                <td>NOW</td>
-                                <td>2</td>
+                                <td>SMCI</td>
+                                <td>3</td>
+                                <td>$101,510.40</td>
+                                <td>$131,241.26</td>
+                                <td class="text-danger">
+                                    -22.7%
+                                </td>
                             </tr>
                             
                             <tr>
-                                <td>ANET</td>
-                                <td>2</td>
+                                <td>DJT</td>
+                                <td>3</td>
+                                <td>$121,723.20</td>
+                                <td>$133,476.66</td>
+                                <td class="text-danger">
+                                    -8.8%
+                                </td>
                             </tr>
                             
                             <tr>
-                                <td>ISRG</td>
-                                <td>2</td>
+                                <td>TT</td>
+                                <td>3</td>
+                                <td>$89,071.08</td>
+                                <td>$81,402.25</td>
+                                <td class="text-success">
+                                    +9.4%
+                                </td>
                             </tr>
                             
                             <tr>
-                                <td>VGT</td>
-                                <td>2</td>
+                                <td>PANW</td>
+                                <td>3</td>
+                                <td>$36,842.90</td>
+                                <td>$36,053.09</td>
+                                <td class="text-success">
+                                    +2.2%
+                                </td>
                             </tr>
                             
                             <tr>
-                                <td>SMMT</td>
-                                <td>2</td>
+                                <td>JNJ</td>
+                                <td>3</td>
+                                <td>$6,510.42</td>
+                                <td>$6,625.88</td>
+                                <td class="text-danger">
+                                    -1.7%
+                                </td>
                             </tr>
                             
                             <tr>
-                                <td>PGR</td>
-                                <td>2</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>PACS</td>
-                                <td>2</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>ADSK</td>
-                                <td>2</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>CAT</td>
-                                <td>2</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>ROKU</td>
-                                <td>2</td>
+                                <td>F</td>
+                                <td>3</td>
+                                <td>$8,570.10</td>
+                                <td>$8,249.10</td>
+                                <td class="text-success">
+                                    +3.9%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>LOAR</td>
                                 <td>2</td>
+                                <td>$13,812.00</td>
+                                <td>$10,574.74</td>
+                                <td class="text-success">
+                                    +30.6%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>NNE</td>
                                 <td>2</td>
+                                <td>$18,222.60</td>
+                                <td>$11,013.12</td>
+                                <td class="text-success">
+                                    +65.5%
+                                </td>
                             </tr>
                             
                             <tr>
-                                <td>NDAQ</td>
+                                <td>PACS</td>
                                 <td>2</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>TTWO</td>
-                                <td>2</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>DIA</td>
-                                <td>2</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>SHW</td>
-                                <td>2</td>
+                                <td>$5,849.70</td>
+                                <td>$14,734.50</td>
+                                <td class="text-danger">
+                                    -60.3%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>DELL</td>
                                 <td>2</td>
+                                <td>$13,396.95</td>
+                                <td>$14,981.03</td>
+                                <td class="text-danger">
+                                    -10.6%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>ASTS</td>
+                                <td>2</td>
+                                <td>$5,119.15</td>
+                                <td>$6,279.66</td>
+                                <td class="text-danger">
+                                    -18.5%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>NVDL</td>
+                                <td>2</td>
+                                <td>$142,414.09</td>
+                                <td>$156,000.58</td>
+                                <td class="text-danger">
+                                    -8.7%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>DIA</td>
+                                <td>2</td>
+                                <td>$50,410.08</td>
+                                <td>$45,694.58</td>
+                                <td class="text-success">
+                                    +10.3%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>ADSK</td>
+                                <td>2</td>
+                                <td>$14,011.20</td>
+                                <td>$14,370.16</td>
+                                <td class="text-danger">
+                                    -2.5%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>RKLB</td>
+                                <td>2</td>
+                                <td>$40,920.00</td>
+                                <td>$14,630.52</td>
+                                <td class="text-success">
+                                    +179.7%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>ISRG</td>
+                                <td>2</td>
+                                <td>$21,680.00</td>
+                                <td>$19,346.15</td>
+                                <td class="text-success">
+                                    +12.1%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>SHW</td>
+                                <td>2</td>
+                                <td>$25,831.00</td>
+                                <td>$24,616.30</td>
+                                <td class="text-success">
+                                    +4.9%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>SMMT</td>
+                                <td>2</td>
+                                <td>$4,799.60</td>
+                                <td>$5,271.20</td>
+                                <td class="text-danger">
+                                    -8.9%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>VGT</td>
+                                <td>2</td>
+                                <td>$24,890.00</td>
+                                <td>$23,525.39</td>
+                                <td class="text-success">
+                                    +5.8%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>VZ</td>
+                                <td>2</td>
+                                <td>$9,089.70</td>
+                                <td>$8,478.45</td>
+                                <td class="text-success">
+                                    +7.2%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>NOW</td>
+                                <td>2</td>
+                                <td>$70,312.48</td>
+                                <td>$63,165.00</td>
+                                <td class="text-success">
+                                    +11.3%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>ANF</td>
+                                <td>2</td>
+                                <td>$6,885.74</td>
+                                <td>$7,543.82</td>
+                                <td class="text-danger">
+                                    -8.7%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>NDAQ</td>
+                                <td>2</td>
+                                <td>$12,614.48</td>
+                                <td>$10,763.96</td>
+                                <td class="text-success">
+                                    +17.2%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>ADMA</td>
+                                <td>2</td>
+                                <td>$6,475.42</td>
+                                <td>$5,747.08</td>
+                                <td class="text-success">
+                                    +12.7%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>CVS</td>
+                                <td>2</td>
+                                <td>$2,573.55</td>
+                                <td>$2,479.80</td>
+                                <td class="text-success">
+                                    +3.8%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>ROKU</td>
+                                <td>2</td>
+                                <td>$31,684.77</td>
+                                <td>$31,546.21</td>
+                                <td class="text-success">
+                                    +0.4%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>CAT</td>
+                                <td>2</td>
+                                <td>$2,436.66</td>
+                                <td>$2,159.41</td>
+                                <td class="text-success">
+                                    +12.8%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>AXP</td>
                                 <td>2</td>
+                                <td>$10,359.12</td>
+                                <td>$9,123.54</td>
+                                <td class="text-success">
+                                    +13.5%
+                                </td>
                             </tr>
                             
                             <tr>
-                                <td>HOOD</td>
-                                <td>1</td>
+                                <td>ANET</td>
+                                <td>2</td>
+                                <td>$10,145.50</td>
+                                <td>$8,795.04</td>
+                                <td class="text-success">
+                                    +15.4%
+                                </td>
                             </tr>
                             
                             <tr>
-                                <td>ARM</td>
-                                <td>1</td>
+                                <td>PGR</td>
+                                <td>2</td>
+                                <td>$9,410.80</td>
+                                <td>$8,468.75</td>
+                                <td class="text-success">
+                                    +11.1%
+                                </td>
                             </tr>
                             
                             <tr>
-                                <td>APDN</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>BIDU</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>GLD</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>WDC</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>CONL</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>DKNG</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>MODG</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>SOXL</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>SSO</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>AUR</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>CHDN</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>CLOV</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>CYBN</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>DAVE</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>OUT</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>SKYT</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>SOFI</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>SWK</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>VRTX</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>DB</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>RTX</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>UAL</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>MANU</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>PZZA</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>SPYG</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>ARDX</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>BNO</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>HCP</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>SGC</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>SGMO</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>SNY</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>BROS</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>FLNC</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>NIO</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>KVUE</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>HWKN</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>RCL</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>BE</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>LMND</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>YUMC</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>DESP</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>DRS</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>ENVA</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>MA</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>XOM</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>RSPA</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>VOOG</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>HYG</td>
-                                <td>1</td>
+                                <td>TTWO</td>
+                                <td>2</td>
+                                <td>$16,012.30</td>
+                                <td>$12,413.78</td>
+                                <td class="text-success">
+                                    +29.0%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>AHR</td>
                                 <td>1</td>
+                                <td>$7,452.50</td>
+                                <td>$5,301.25</td>
+                                <td class="text-success">
+                                    +40.6%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>AZI</td>
                                 <td>1</td>
+                                <td>$2,108.00</td>
+                                <td>$5,219.11</td>
+                                <td class="text-danger">
+                                    -59.6%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>INGM</td>
                                 <td>1</td>
+                                <td>$4,764.00</td>
+                                <td>$4,821.86</td>
+                                <td class="text-danger">
+                                    -1.2%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>IZTC</td>
                                 <td>1</td>
+                                <td>$4,410.00</td>
+                                <td>$4,641.13</td>
+                                <td class="text-danger">
+                                    -5.0%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>RYDE</td>
                                 <td>1</td>
+                                <td>$247.62</td>
+                                <td>$5,279.74</td>
+                                <td class="text-danger">
+                                    -95.3%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>SEPN</td>
                                 <td>1</td>
+                                <td>$5,690.25</td>
+                                <td>$4,992.76</td>
+                                <td class="text-success">
+                                    +14.0%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>ULS</td>
                                 <td>1</td>
+                                <td>$5,373.00</td>
+                                <td>$5,146.06</td>
+                                <td class="text-success">
+                                    +4.4%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>WRD</td>
                                 <td>1</td>
+                                <td>$5,211.00</td>
+                                <td>$5,397.20</td>
+                                <td class="text-danger">
+                                    -3.4%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>YXT</td>
                                 <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>BBWI</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>KSS</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>MSI</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>UPS</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>BND</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>SO</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>CMCSA</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>GS</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>TKO</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>PEP</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>CRM</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>BLK</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>CCJ</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>CLSK</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>PAYC</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>KB</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>UCO</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>WLDN</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>REGN</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>DAL</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>TXN</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>AFRM</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>NET</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>DASH</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>RDNT</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>ONON</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>CART</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>NCLH</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>HRB</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>LEVI</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>SMH</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>DKS</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>IREN</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>NBIX</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>KO</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>BMY</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>UNH</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>FI</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>GILD</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>HCA</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>AMGN</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>MRCY</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>SMPL</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>T</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>RACE</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>TTD</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>QLD</td>
-                                <td>1</td>
+                                <td>$1,424.50</td>
+                                <td>$5,114.90</td>
+                                <td class="text-danger">
+                                    -72.2%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>ABT</td>
                                 <td>1</td>
+                                <td>$2,375.40</td>
+                                <td>$2,258.41</td>
+                                <td class="text-success">
+                                    +5.2%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>FTNT</td>
                                 <td>1</td>
+                                <td>$1,425.75</td>
+                                <td>$1,134.88</td>
+                                <td class="text-success">
+                                    +25.6%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>LWAY</td>
                                 <td>1</td>
+                                <td>$1,467.00</td>
+                                <td>$1,002.60</td>
+                                <td class="text-success">
+                                    +46.3%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>NICE</td>
                                 <td>1</td>
+                                <td>$1,459.52</td>
+                                <td>$1,450.38</td>
+                                <td class="text-success">
+                                    +0.6%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>TRGP</td>
                                 <td>1</td>
+                                <td>$5,107.50</td>
+                                <td>$4,680.20</td>
+                                <td class="text-success">
+                                    +9.1%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>VSTS</td>
                                 <td>1</td>
+                                <td>$1,608.00</td>
+                                <td>$1,331.02</td>
+                                <td class="text-success">
+                                    +20.8%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>KO</td>
+                                <td>1</td>
+                                <td>$4,485.60</td>
+                                <td>$4,858.75</td>
+                                <td class="text-danger">
+                                    -7.7%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>ONON</td>
+                                <td>1</td>
+                                <td>$2,333.20</td>
+                                <td>$1,706.43</td>
+                                <td class="text-success">
+                                    +36.7%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>PAYC</td>
+                                <td>1</td>
+                                <td>$5,798.00</td>
+                                <td>$4,020.53</td>
+                                <td class="text-success">
+                                    +44.2%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>NET</td>
+                                <td>1</td>
+                                <td>$2,994.90</td>
+                                <td>$2,905.13</td>
+                                <td class="text-success">
+                                    +3.1%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>CDNS</td>
                                 <td>1</td>
+                                <td>$3,068.10</td>
+                                <td>$2,753.39</td>
+                                <td class="text-success">
+                                    +11.4%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>LUV</td>
                                 <td>1</td>
+                                <td>$6,472.00</td>
+                                <td>$5,435.00</td>
+                                <td class="text-success">
+                                    +19.1%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>RIOT</td>
                                 <td>1</td>
+                                <td>$2,656.50</td>
+                                <td>$1,704.20</td>
+                                <td class="text-success">
+                                    +55.9%
+                                </td>
                             </tr>
                             
                             <tr>
-                                <td>APD</td>
+                                <td>ARM</td>
                                 <td>1</td>
+                                <td>$14,369.03</td>
+                                <td>$15,328.60</td>
+                                <td class="text-danger">
+                                    -6.3%
+                                </td>
                             </tr>
                             
                             <tr>
-                                <td>COIN</td>
+                                <td>DASH</td>
                                 <td>1</td>
+                                <td>$9,024.00</td>
+                                <td>$7,210.55</td>
+                                <td class="text-success">
+                                    +25.2%
+                                </td>
                             </tr>
                             
                             <tr>
-                                <td>HSY</td>
+                                <td>RDNT</td>
                                 <td>1</td>
+                                <td>$4,905.60</td>
+                                <td>$4,104.42</td>
+                                <td class="text-success">
+                                    +19.5%
+                                </td>
                             </tr>
                             
                             <tr>
-                                <td>KALU</td>
+                                <td>HOOD</td>
                                 <td>1</td>
+                                <td>$19,032.78</td>
+                                <td>$12,026.27</td>
+                                <td class="text-success">
+                                    +58.3%
+                                </td>
                             </tr>
                             
                             <tr>
-                                <td>UNP</td>
+                                <td>SMPL</td>
                                 <td>1</td>
+                                <td>$2,347.61</td>
+                                <td>$1,988.49</td>
+                                <td class="text-success">
+                                    +18.1%
+                                </td>
                             </tr>
                             
                             <tr>
-                                <td>QQQM</td>
+                                <td>T</td>
                                 <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>SWBI</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>AFB</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>UBS</td>
-                                <td>1</td>
+                                <td>$1,737.00</td>
+                                <td>$1,505.46</td>
+                                <td class="text-success">
+                                    +15.4%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>GIS</td>
                                 <td>1</td>
+                                <td>$5,963.40</td>
+                                <td>$6,439.26</td>
+                                <td class="text-danger">
+                                    -7.4%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>FI</td>
+                                <td>1</td>
+                                <td>$6,628.80</td>
+                                <td>$5,158.20</td>
+                                <td class="text-success">
+                                    +28.5%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>GILD</td>
+                                <td>1</td>
+                                <td>$6,017.70</td>
+                                <td>$5,117.96</td>
+                                <td class="text-success">
+                                    +17.6%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>HCA</td>
+                                <td>1</td>
+                                <td>$4,908.30</td>
+                                <td>$5,855.76</td>
+                                <td class="text-danger">
+                                    -16.2%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>FNGD</td>
                                 <td>1</td>
+                                <td>$29,067.50</td>
+                                <td>$31,489.00</td>
+                                <td class="text-danger">
+                                    -7.7%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>SERV</td>
                                 <td>1</td>
+                                <td>$4,350.00</td>
+                                <td>$5,325.01</td>
+                                <td class="text-danger">
+                                    -18.3%
+                                </td>
                             </tr>
                             
                             <tr>
-                                <td>IBM</td>
+                                <td>KVUE</td>
                                 <td>1</td>
+                                <td>$1,685.60</td>
+                                <td>$1,543.59</td>
+                                <td class="text-success">
+                                    +9.2%
+                                </td>
                             </tr>
                             
                             <tr>
-                                <td>SHEL</td>
+                                <td>ARDX</td>
                                 <td>1</td>
+                                <td>$4,252.50</td>
+                                <td>$4,702.53</td>
+                                <td class="text-danger">
+                                    -9.6%
+                                </td>
                             </tr>
                             
                             <tr>
-                                <td>KHC</td>
+                                <td>BNO</td>
                                 <td>1</td>
+                                <td>$2,900.00</td>
+                                <td>$3,083.14</td>
+                                <td class="text-danger">
+                                    -5.9%
+                                </td>
                             </tr>
                             
                             <tr>
-                                <td>KR</td>
+                                <td>HCP</td>
                                 <td>1</td>
+                                <td>$15,263.48</td>
+                                <td>$15,416.10</td>
+                                <td class="text-danger">
+                                    -1.0%
+                                </td>
                             </tr>
                             
                             <tr>
-                                <td>IRM</td>
+                                <td>SGC</td>
                                 <td>1</td>
+                                <td>$12,697.50</td>
+                                <td>$11,362.42</td>
+                                <td class="text-success">
+                                    +11.7%
+                                </td>
                             </tr>
                             
                             <tr>
-                                <td>WAB</td>
+                                <td>SGMO</td>
                                 <td>1</td>
+                                <td>$2,260.00</td>
+                                <td>$2,454.92</td>
+                                <td class="text-danger">
+                                    -7.9%
+                                </td>
                             </tr>
                             
                             <tr>
-                                <td>AMAT</td>
+                                <td>SNY</td>
                                 <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>SG</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>OSTX</td>
-                                <td>1</td>
-                            </tr>
-                            
-                            <tr>
-                                <td>LRCX</td>
-                                <td>1</td>
+                                <td>$3,394.30</td>
+                                <td>$4,028.84</td>
+                                <td class="text-danger">
+                                    -15.7%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>AMDL</td>
                                 <td>1</td>
+                                <td>$60,398.00</td>
+                                <td>$82,918.73</td>
+                                <td class="text-danger">
+                                    -27.2%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>AFB</td>
+                                <td>1</td>
+                                <td>$114.90</td>
+                                <td>$114.31</td>
+                                <td class="text-success">
+                                    +0.5%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>VRTX</td>
+                                <td>1</td>
+                                <td>$23,406.50</td>
+                                <td>$24,499.16</td>
+                                <td class="text-danger">
+                                    -4.5%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>UBS</td>
+                                <td>1</td>
+                                <td>$1,131.90</td>
+                                <td>$1,076.97</td>
+                                <td class="text-success">
+                                    +5.1%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>QQQM</td>
+                                <td>1</td>
+                                <td>$4,615.60</td>
+                                <td>$4,334.71</td>
+                                <td class="text-success">
+                                    +6.5%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>APDN</td>
+                                <td>1</td>
+                                <td>$330.27</td>
+                                <td>$4,914.73</td>
+                                <td class="text-danger">
+                                    -93.3%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>BIDU</td>
+                                <td>1</td>
+                                <td>$1,445.85</td>
+                                <td>$1,469.51</td>
+                                <td class="text-danger">
+                                    -1.6%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>GLD</td>
+                                <td>1</td>
+                                <td>$6,630.93</td>
+                                <td>$6,836.01</td>
+                                <td class="text-danger">
+                                    -3.0%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>WDC</td>
+                                <td>1</td>
+                                <td>$1,167.84</td>
+                                <td>$983.69</td>
+                                <td class="text-success">
+                                    +18.7%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>CMCSA</td>
+                                <td>1</td>
+                                <td>$5,485.13</td>
+                                <td>$4,976.08</td>
+                                <td class="text-success">
+                                    +10.2%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>GS</td>
+                                <td>1</td>
+                                <td>$3,651.42</td>
+                                <td>$2,996.16</td>
+                                <td class="text-success">
+                                    +21.9%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>TKO</td>
+                                <td>1</td>
+                                <td>$4,828.60</td>
+                                <td>$4,339.14</td>
+                                <td class="text-success">
+                                    +11.3%
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>ABIO</td>
                                 <td>1</td>
+                                <td>$0.00</td>
+                                <td>$0.00</td>
+                                <td class="text-success">
+                                    +0.0%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>REGN</td>
+                                <td>1</td>
+                                <td>$10,503.08</td>
+                                <td>$16,321.80</td>
+                                <td class="text-danger">
+                                    -35.7%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>KHC</td>
+                                <td>1</td>
+                                <td>$7,992.50</td>
+                                <td>$7,789.96</td>
+                                <td class="text-success">
+                                    +2.6%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>KR</td>
+                                <td>1</td>
+                                <td>$15,270.00</td>
+                                <td>$14,132.35</td>
+                                <td class="text-success">
+                                    +8.1%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>DAL</td>
+                                <td>1</td>
+                                <td>$1,914.60</td>
+                                <td>$1,192.23</td>
+                                <td class="text-success">
+                                    +60.6%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>TXN</td>
+                                <td>1</td>
+                                <td>$8,041.20</td>
+                                <td>$7,926.27</td>
+                                <td class="text-success">
+                                    +1.4%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>LRCX</td>
+                                <td>1</td>
+                                <td>$7,388.00</td>
+                                <td>$8,672.38</td>
+                                <td class="text-danger">
+                                    -14.8%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>QLD</td>
+                                <td>1</td>
+                                <td>$10,929.21</td>
+                                <td>$9,947.40</td>
+                                <td class="text-success">
+                                    +9.9%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>CRM</td>
+                                <td>1</td>
+                                <td>$6,599.80</td>
+                                <td>$5,107.81</td>
+                                <td class="text-success">
+                                    +29.2%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>RACE</td>
+                                <td>1</td>
+                                <td>$15,195.60</td>
+                                <td>$15,271.96</td>
+                                <td class="text-danger">
+                                    -0.5%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>TTD</td>
+                                <td>1</td>
+                                <td>$4,884.90</td>
+                                <td>$4,996.83</td>
+                                <td class="text-danger">
+                                    -2.2%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>MANU</td>
+                                <td>1</td>
+                                <td>$16.98</td>
+                                <td>$17.26</td>
+                                <td class="text-danger">
+                                    -1.6%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>PZZA</td>
+                                <td>1</td>
+                                <td>$49.83</td>
+                                <td>$59.01</td>
+                                <td class="text-danger">
+                                    -15.6%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>APD</td>
+                                <td>1</td>
+                                <td>$5,014.95</td>
+                                <td>$4,956.46</td>
+                                <td class="text-success">
+                                    +1.2%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>COIN</td>
+                                <td>1</td>
+                                <td>$5,924.00</td>
+                                <td>$6,463.72</td>
+                                <td class="text-danger">
+                                    -8.4%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>HSY</td>
+                                <td>1</td>
+                                <td>$5,283.90</td>
+                                <td>$5,175.22</td>
+                                <td class="text-success">
+                                    +2.1%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>KALU</td>
+                                <td>1</td>
+                                <td>$4,064.00</td>
+                                <td>$4,143.56</td>
+                                <td class="text-danger">
+                                    -1.9%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>CONL</td>
+                                <td>1</td>
+                                <td>$10,035.44</td>
+                                <td>$6,118.42</td>
+                                <td class="text-success">
+                                    +64.0%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>DKNG</td>
+                                <td>1</td>
+                                <td>$12,658.50</td>
+                                <td>$9,926.68</td>
+                                <td class="text-success">
+                                    +27.5%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>MODG</td>
+                                <td>1</td>
+                                <td>$7,401.18</td>
+                                <td>$10,002.95</td>
+                                <td class="text-danger">
+                                    -26.0%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>SOXL</td>
+                                <td>1</td>
+                                <td>$7,015.00</td>
+                                <td>$9,819.43</td>
+                                <td class="text-danger">
+                                    -28.6%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>SSO</td>
+                                <td>1</td>
+                                <td>$23,536.80</td>
+                                <td>$20,320.12</td>
+                                <td class="text-success">
+                                    +15.8%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>BMY</td>
+                                <td>1</td>
+                                <td>$5,507.46</td>
+                                <td>$4,966.15</td>
+                                <td class="text-success">
+                                    +10.9%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>UNH</td>
+                                <td>1</td>
+                                <td>$5,491.80</td>
+                                <td>$5,329.26</td>
+                                <td class="text-success">
+                                    +3.0%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>BND</td>
+                                <td>1</td>
+                                <td>$294.40</td>
+                                <td>$298.55</td>
+                                <td class="text-danger">
+                                    -1.4%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>SO</td>
+                                <td>1</td>
+                                <td>$20,232.51</td>
+                                <td>$19,712.11</td>
+                                <td class="text-success">
+                                    +2.6%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>UNP</td>
+                                <td>1</td>
+                                <td>$14,679.60</td>
+                                <td>$14,882.00</td>
+                                <td class="text-danger">
+                                    -1.4%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>RSPA</td>
+                                <td>1</td>
+                                <td>$9,137.90</td>
+                                <td>$8,796.59</td>
+                                <td class="text-success">
+                                    +3.9%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>VOOG</td>
+                                <td>1</td>
+                                <td>$12,733.00</td>
+                                <td>$11,792.00</td>
+                                <td class="text-success">
+                                    +8.0%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>HYG</td>
+                                <td>1</td>
+                                <td>$10,005.00</td>
+                                <td>$9,805.94</td>
+                                <td class="text-success">
+                                    +2.0%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>KB</td>
+                                <td>1</td>
+                                <td>$7,582.30</td>
+                                <td>$7,246.77</td>
+                                <td class="text-success">
+                                    +4.6%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>UCO</td>
+                                <td>1</td>
+                                <td>$485.26</td>
+                                <td>$560.61</td>
+                                <td class="text-danger">
+                                    -13.4%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>WLDN</td>
+                                <td>1</td>
+                                <td>$4,327.29</td>
+                                <td>$4,234.14</td>
+                                <td class="text-success">
+                                    +2.2%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>DESP</td>
+                                <td>1</td>
+                                <td>$894.50</td>
+                                <td>$871.49</td>
+                                <td class="text-success">
+                                    +2.6%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>DRS</td>
+                                <td>1</td>
+                                <td>$17,419.77</td>
+                                <td>$15,965.33</td>
+                                <td class="text-success">
+                                    +9.1%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>ENVA</td>
+                                <td>1</td>
+                                <td>$1,055.10</td>
+                                <td>$888.13</td>
+                                <td class="text-success">
+                                    +18.8%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>MA</td>
+                                <td>1</td>
+                                <td>$2,664.70</td>
+                                <td>$2,537.81</td>
+                                <td class="text-success">
+                                    +5.0%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>XOM</td>
+                                <td>1</td>
+                                <td>$589.80</td>
+                                <td>$592.88</td>
+                                <td class="text-danger">
+                                    -0.5%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>IRM</td>
+                                <td>1</td>
+                                <td>$39,079.72</td>
+                                <td>$38,471.86</td>
+                                <td class="text-success">
+                                    +1.6%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>WAB</td>
+                                <td>1</td>
+                                <td>$20,062.00</td>
+                                <td>$19,007.11</td>
+                                <td class="text-success">
+                                    +5.6%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>SMH</td>
+                                <td>1</td>
+                                <td>$726.39</td>
+                                <td>$707.43</td>
+                                <td class="text-success">
+                                    +2.7%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>AMGN</td>
+                                <td>1</td>
+                                <td>$1,980.09</td>
+                                <td>$2,287.01</td>
+                                <td class="text-danger">
+                                    -13.4%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>MRCY</td>
+                                <td>1</td>
+                                <td>$822.60</td>
+                                <td>$792.41</td>
+                                <td class="text-success">
+                                    +3.8%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>HWKN</td>
+                                <td>1</td>
+                                <td>$8,474.13</td>
+                                <td>$7,452.41</td>
+                                <td class="text-success">
+                                    +13.7%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>RCL</td>
+                                <td>1</td>
+                                <td>$11,226.76</td>
+                                <td>$7,396.73</td>
+                                <td class="text-success">
+                                    +51.8%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>LEVI</td>
+                                <td>1</td>
+                                <td>$9,253.80</td>
+                                <td>$10,041.02</td>
+                                <td class="text-danger">
+                                    -7.8%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>BE</td>
+                                <td>1</td>
+                                <td>$11,419.20</td>
+                                <td>$9,818.74</td>
+                                <td class="text-success">
+                                    +16.3%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>LMND</td>
+                                <td>1</td>
+                                <td>$5,077.38</td>
+                                <td>$4,996.93</td>
+                                <td class="text-success">
+                                    +1.6%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>AUR</td>
+                                <td>1</td>
+                                <td>$129.40</td>
+                                <td>$100.00</td>
+                                <td class="text-success">
+                                    +29.4%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>CHDN</td>
+                                <td>1</td>
+                                <td>$3,126.42</td>
+                                <td>$2,972.73</td>
+                                <td class="text-success">
+                                    +5.2%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>CLOV</td>
+                                <td>1</td>
+                                <td>$233.16</td>
+                                <td>$255.18</td>
+                                <td class="text-danger">
+                                    -8.6%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>CYBN</td>
+                                <td>1</td>
+                                <td>$228.36</td>
+                                <td>$199.21</td>
+                                <td class="text-success">
+                                    +14.6%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>DAVE</td>
+                                <td>1</td>
+                                <td>$3,355.12</td>
+                                <td>$1,430.02</td>
+                                <td class="text-success">
+                                    +134.6%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>OUT</td>
+                                <td>1</td>
+                                <td>$576.30</td>
+                                <td>$547.50</td>
+                                <td class="text-success">
+                                    +5.3%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>SKYT</td>
+                                <td>1</td>
+                                <td>$1,230.70</td>
+                                <td>$1,527.11</td>
+                                <td class="text-danger">
+                                    -19.4%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>SOFI</td>
+                                <td>1</td>
+                                <td>$656.40</td>
+                                <td>$420.72</td>
+                                <td class="text-success">
+                                    +56.0%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>SWK</td>
+                                <td>1</td>
+                                <td>$1,967.90</td>
+                                <td>$2,351.70</td>
+                                <td class="text-danger">
+                                    -16.3%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>DKS</td>
+                                <td>1</td>
+                                <td>$7,253.40</td>
+                                <td>$7,580.89</td>
+                                <td class="text-danger">
+                                    -4.3%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>IREN</td>
+                                <td>1</td>
+                                <td>$13,510.00</td>
+                                <td>$11,619.51</td>
+                                <td class="text-success">
+                                    +16.3%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>NBIX</td>
+                                <td>1</td>
+                                <td>$7,605.00</td>
+                                <td>$7,308.28</td>
+                                <td class="text-success">
+                                    +4.1%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>CART</td>
+                                <td>1</td>
+                                <td>$218.35</td>
+                                <td>$185.25</td>
+                                <td class="text-success">
+                                    +17.9%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>NCLH</td>
+                                <td>1</td>
+                                <td>$1,344.50</td>
+                                <td>$1,217.73</td>
+                                <td class="text-success">
+                                    +10.4%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>AMAT</td>
+                                <td>1</td>
+                                <td>$17,471.00</td>
+                                <td>$20,700.24</td>
+                                <td class="text-danger">
+                                    -15.6%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>SG</td>
+                                <td>1</td>
+                                <td>$614.70</td>
+                                <td>$577.13</td>
+                                <td class="text-success">
+                                    +6.5%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>PEP</td>
+                                <td>1</td>
+                                <td>$2,451.75</td>
+                                <td>$2,584.87</td>
+                                <td class="text-danger">
+                                    -5.1%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>BROS</td>
+                                <td>1</td>
+                                <td>$107.46</td>
+                                <td>$70.14</td>
+                                <td class="text-success">
+                                    +53.2%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>FLNC</td>
+                                <td>1</td>
+                                <td>$9,405.00</td>
+                                <td>$8,385.34</td>
+                                <td class="text-success">
+                                    +12.2%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>NIO</td>
+                                <td>1</td>
+                                <td>$627.20</td>
+                                <td>$803.69</td>
+                                <td class="text-danger">
+                                    -22.0%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>BBWI</td>
+                                <td>1</td>
+                                <td>$4,348.80</td>
+                                <td>$4,118.57</td>
+                                <td class="text-success">
+                                    +5.6%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>KSS</td>
+                                <td>1</td>
+                                <td>$2,994.00</td>
+                                <td>$3,874.22</td>
+                                <td class="text-danger">
+                                    -22.7%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>MSI</td>
+                                <td>1</td>
+                                <td>$1,499.10</td>
+                                <td>$1,279.20</td>
+                                <td class="text-success">
+                                    +17.2%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>UPS</td>
+                                <td>1</td>
+                                <td>$2,714.40</td>
+                                <td>$2,566.81</td>
+                                <td class="text-success">
+                                    +5.8%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>SWBI</td>
+                                <td>1</td>
+                                <td>$1,358.00</td>
+                                <td>$1,467.95</td>
+                                <td class="text-danger">
+                                    -7.5%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>IBM</td>
+                                <td>1</td>
+                                <td>$909.64</td>
+                                <td>$847.99</td>
+                                <td class="text-success">
+                                    +7.3%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>SPYG</td>
+                                <td>1</td>
+                                <td>$54,600.00</td>
+                                <td>$49,935.98</td>
+                                <td class="text-success">
+                                    +9.3%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>SHEL</td>
+                                <td>1</td>
+                                <td>$971.10</td>
+                                <td>$1,032.43</td>
+                                <td class="text-danger">
+                                    -5.9%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>HRB</td>
+                                <td>1</td>
+                                <td>$4,742.40</td>
+                                <td>$5,375.04</td>
+                                <td class="text-danger">
+                                    -11.8%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>OSTX</td>
+                                <td>1</td>
+                                <td>$4,280.00</td>
+                                <td>$8,199.23</td>
+                                <td class="text-danger">
+                                    -47.8%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>AFRM</td>
+                                <td>1</td>
+                                <td>$10,501.50</td>
+                                <td>$5,866.43</td>
+                                <td class="text-success">
+                                    +79.0%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>DB</td>
+                                <td>1</td>
+                                <td>$10,852.38</td>
+                                <td>$9,997.59</td>
+                                <td class="text-success">
+                                    +8.5%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>RTX</td>
+                                <td>1</td>
+                                <td>$5,116.86</td>
+                                <td>$4,969.76</td>
+                                <td class="text-success">
+                                    +3.0%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>UAL</td>
+                                <td>1</td>
+                                <td>$22,755.05</td>
+                                <td>$10,006.18</td>
+                                <td class="text-success">
+                                    +127.4%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>YUMC</td>
+                                <td>1</td>
+                                <td>$19,085.50</td>
+                                <td>$13,726.63</td>
+                                <td class="text-success">
+                                    +39.0%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>BLK</td>
+                                <td>1</td>
+                                <td>$2,045.60</td>
+                                <td>$1,739.01</td>
+                                <td class="text-success">
+                                    +17.6%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>CCJ</td>
+                                <td>1</td>
+                                <td>$1,486.25</td>
+                                <td>$1,066.25</td>
+                                <td class="text-success">
+                                    +39.4%
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>CLSK</td>
+                                <td>1</td>
+                                <td>$2,870.00</td>
+                                <td>$2,405.90</td>
+                                <td class="text-success">
+                                    +19.3%
+                                </td>
                             </tr>
                             
                         </tbody>

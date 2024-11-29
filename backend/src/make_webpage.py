@@ -101,6 +101,75 @@ def make_index_page():
     with app.app_context():
         leaderboard_files = sorted(glob("./backend/leaderboards/in_time/*"))
 
+        # Load latest leaderboard first
+        with open("backend/leaderboards/leaderboard-latest.json", "r") as file:
+            latest_data = json.load(file)
+
+        # Initialize all_stocks list
+        all_stocks = []
+        stock_values = {}
+        total_investment = 0
+
+        # Process all stocks from latest data
+        for player_data in latest_data.values():
+            try:
+                stocks = player_data[2]  # Get stock holdings
+                if stocks:  # Add stocks to all_stocks list
+                    all_stocks.extend([stock[0] for stock in stocks])
+                for stock in stocks:
+                    symbol = stock[0]
+                    current_price = float(stock[1].replace("$", "").replace(",", ""))
+                    pct_change = (
+                        float(stock[2].replace("%", "")) / 100
+                    )  # Convert to decimal
+
+                    # Guard against division by zero
+                    if pct_change == -1:  # Edge case where percent change is -100%
+                        initial_price = current_price  # Use current price as initial
+                    else:
+                        initial_price = current_price / (
+                            1 + pct_change
+                        )  # Calculate initial price
+
+                    if symbol not in stock_values:
+                        stock_values[symbol] = {"current": 0, "initial": 0}
+                    stock_values[symbol]["current"] += current_price
+                    stock_values[symbol]["initial"] += initial_price
+                    total_investment += current_price
+
+            except (IndexError, ValueError, TypeError):
+                continue
+
+        # Add initial and current values to stock_cnt data
+        stock_data = []
+        for symbol, values in stock_values.items():
+            current_value = values["current"]
+            initial_value = values["initial"]
+            if initial_value > 0:
+                percent_change = ((current_value / initial_value) - 1) * 100
+                stock_data.append(
+                    (symbol, current_value, initial_value, percent_change)
+                )
+
+        # Create stock_cnt with all required data
+        stock_counter = Counter(all_stocks).most_common()
+        stock_cnt = []
+        for stock, count in stock_counter:
+            stock_info = next((s for s in stock_data if s[0] == stock), None)
+            if stock_info:
+                stock_cnt.append(
+                    (
+                        stock,
+                        count,
+                        stock_info[1],  # Current value
+                        stock_info[2],  # Initial value
+                        stock_info[3],  # Percent change
+                    )
+                )
+            else:
+                stock_cnt.append((stock, count, 0, 0, 0))
+
+        # Continue with existing code
         # First collect all raw timestamps and data
         raw_timestamps = []
         raw_data = {"min": [], "max": [], "q1": [], "median": [], "q3": [], "sp500": []}
@@ -266,18 +335,14 @@ def make_index_page():
         )
         df = df.sort("Money In Account", descending=True)
         df = df.with_columns(pl.Series(name="Ranking", values=range(1, len(df) + 1)))
-        all_stocks = []
-        for stocks in df.get_column("Stocks Invested In"):
-            if len(stocks) > 0:
-                all_stocks.extend([x[0] for x in stocks])
-        stock_cnt = Counter(
-            all_stocks
-        ).most_common()  # In order to determine the most common stocks. Now stock_cnt is a list of tuples
+
+        # Keep only the stock_cnt with performance data from earlier
         df = df.with_columns(
             pl.col("Stocks Invested In").map_elements(
                 lambda x: ", ".join([stock[0] for stock in x]), return_dtype=pl.Utf8
             )
         )
+
         df = df.with_columns(
             pl.Series(
                 name="Z-Score",
