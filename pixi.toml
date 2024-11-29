@@ -24,6 +24,7 @@ babel = ">=2.14.0,<3"
 pre-commit = ">=4.0.1,<5"
 numpy = "1.*"
 python = ">=3.12.7,<3.13"
+polars = ">=1.15.0,<2"
 
 [pypi-dependencies]
 yfinance = { version = ">=0.2.48, <0.3", extras = ["nospam", "repair"] }

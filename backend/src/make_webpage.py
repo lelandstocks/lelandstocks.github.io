@@ -3,10 +3,10 @@ import os
 from collections import Counter
 from datetime import datetime, timedelta
 from glob import glob
-from multiprocessing import Pool, cpu_count
+from multiprocessing import cpu_count, get_context
 
 import flask
-import pandas as pd
+import polars as pl  # Replace pandas with polars
 from babel.numbers import format_currency
 from flask import render_template
 from scipy.stats import zscore
@@ -16,13 +16,18 @@ import yfinance as yf
 # this whole file is to render the html table
 app = flask.Flask("leaderboard")
 
+# Set multiprocessing to use 'spawn' for Polars compatibility
+MULTIPROCESSING_CONTEXT = get_context("spawn")
+
 
 def get_five_number_summary(df):
-    average_money = df["Money In Account"].mean()
-    q1_money = df["Money In Account"].quantile(0.25)
-    median_money = df["Money In Account"].median()
-    q3_money = df["Money In Account"].quantile(0.75)
-    std_money = df["Money In Account"].std()
+    # Update summary statistics using polars
+    money_series = df.get_column("Money In Account")
+    average_money = money_series.mean()
+    q1_money = money_series.quantile(0.25)
+    median_money = money_series.quantile(0.5)
+    q3_money = money_series.quantile(0.75)
+    std_money = money_series.std()
     return average_money, q1_money, median_money, q3_money, std_money
 
 
@@ -145,24 +150,31 @@ def make_index_page():
                 dict_leaderboard = json.load(f)
 
             # Process leaderboard data
-            df = pd.DataFrame.from_dict(dict_leaderboard, orient="index")
-            df.reset_index(level=0, inplace=True)
+            df = pl.DataFrame(
+                [
+                    {
+                        "Account Name": k,
+                        "Money In Account": v[0],
+                        "Investopedia Link": v[1],
+                        "Stocks Invested In": v[2] if len(v) > 2 else [],
+                    }
+                    for k, v in dict_leaderboard.items()
+                ]
+            )
+            df = df.sort("Money In Account", descending=True)
             if (
                 len(df.columns) == 3
             ):  # IF the file has only 3 columns, then add a new column to the dataframe as a place holder
-                df["Stocks Invested In"] = [0 for i in range(len(df))]
-            df.columns = [
-                "Account Name",
-                "Money In Account",
-                "Stocks Invested In",
-                "Investopedia Link",
-            ]
-            df = df.sort_values(by=["Money In Account"], ascending=False)
+                df = df.with_columns(
+                    pl.Series(
+                        name="Stocks Invested In", values=[0 for i in range(len(df))]
+                    )
+                )
             _1, q1_money, median_money, q3_money, _2 = get_five_number_summary(
                 df
             )  # get some key numbers for the charts
-            raw_data["min"].append(int(df["Money In Account"].min()))
-            raw_data["max"].append(int(df["Money In Account"].max()))
+            raw_data["min"].append(int(df.get_column("Money In Account").min()))
+            raw_data["max"].append(int(df.get_column("Money In Account").max()))
             raw_data["q1"].append(int(q1_money))
             raw_data["median"].append(int(median_money))
             raw_data["q3"].append(int(q3_money))
@@ -237,50 +249,60 @@ def make_index_page():
             median_monies = []
             q3_monies = []
             sp500_prices = []
-
-        # Continue with existing code to render the template
-        # ...existing rendering code...
         ### This whole section makes the Individual Statistics
         # Load json as dictionary, then organise it properly: https://stackoverflow.com/a/44607210
         with open("backend/leaderboards/leaderboard-latest.json", "r") as file:
             dict_leaderboard = json.load(file)
-        df = pd.DataFrame.from_dict(dict_leaderboard, orient="index")
-        df.reset_index(level=0, inplace=True)
-        df.columns = [
-            "Account Name",
-            "Money In Account",
-            "Investopedia Link",
-            "Stocks Invested In",
-        ]
-        df = df.sort_values(by=["Money In Account"], ascending=False)
-        df["Ranking"] = range(1, 1 + len(df))
-        all_stocks = []
-        for stocks in df["Stocks Invested In"]:
-            if len(stocks) > 0:
-                for x in stocks:
-                    all_stocks.append(x[0])
-        stock_cnt = Counter(all_stocks)
-        stock_cnt = stock_cnt.most_common()  # In order to determine the most common stocks. Now stock_cnt is a list of tuples
-        df["Stocks Invested In"] = df["Stocks Invested In"].apply(
-            lambda x: ", ".join([stock[0] for stock in x])
+        df = pl.DataFrame(
+            [
+                {
+                    "Account Name": k,
+                    "Money In Account": v[0],
+                    "Investopedia Link": v[1],
+                    "Stocks Invested In": v[2] if len(v) > 2 else [],
+                }
+                for k, v in dict_leaderboard.items()
+            ]
         )
-        df["Z-Score"] = zscore(df["Money In Account"])
-        # Replace Account Name with Account Link
-        df["Account Link"] = df.apply(
-            lambda row: f'<a href="/players/{row["Account Name"]}.html" class= "underline text-blue-600 hover:text-blue-800 visited:text-purple-600 {row["Account Name"]}" target="_blank">{row["Account Name"]}</a>',
-            axis=1,
+        df = df.sort("Money In Account", descending=True)
+        df = df.with_columns(pl.Series(name="Ranking", values=range(1, len(df) + 1)))
+        all_stocks = []
+        for stocks in df.get_column("Stocks Invested In"):
+            if len(stocks) > 0:
+                all_stocks.extend([x[0] for x in stocks])
+        stock_cnt = Counter(
+            all_stocks
+        ).most_common()  # In order to determine the most common stocks. Now stock_cnt is a list of tuples
+        df = df.with_columns(
+            pl.col("Stocks Invested In").map_elements(
+                lambda x: ", ".join([stock[0] for stock in x]), return_dtype=pl.Utf8
+            )
+        )
+        df = df.with_columns(
+            pl.Series(
+                name="Z-Score",
+                values=zscore(df.get_column("Money In Account").to_numpy()),
+            )
+        )
+        df = df.with_columns(
+            pl.struct(["Account Name"])
+            .map_elements(
+                lambda x: f'<a href="/players/{x["Account Name"]}.html" class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600 {x["Account Name"]}" target="_blank">{x["Account Name"]}</a>',
+                return_dtype=pl.Utf8,
+            )
+            .alias("Account Link")
         )
 
         # This gets the location of the the GOAT himself, Mr. Miller
-        miller_location = df.loc[
-            df["Account Name"] == "teachermiller", "Ranking"
-        ].values[0]
+        miller_location = df.filter(pl.col("Account Name") == "teachermiller")[
+            "Ranking"
+        ][0]
 
         # Drop the old Account Name and Investopedia Link columns
-        df = df.drop(columns=["Account Name", "Investopedia Link"])
+        df = df.drop(["Account Name", "Investopedia Link"])
 
         # Rearrange columns with Account Link
-        df = df[
+        df = df.select(
             [
                 "Ranking",
                 "Account Link",
@@ -288,7 +310,7 @@ def make_index_page():
                 "Stocks Invested In",
                 "Z-Score",
             ]
-        ]
+        )
 
         # Update column_names
         column_names = [
@@ -302,8 +324,11 @@ def make_index_page():
         average_money, q1_money, median_money, q3_money, std_money = (
             get_five_number_summary(df)
         )
-        df["Money In Account"] = df["Money In Account"].apply(
-            lambda x: format_currency(x, currency="USD", locale="en_US")
+        df = df.with_columns(
+            pl.col("Money In Account").map_elements(
+                lambda x: format_currency(x, currency="USD", locale="en_US"),
+                return_dtype=pl.Utf8,
+            )
         )
 
         # Modify this section to retrieve a single podcast audio file
@@ -325,7 +350,7 @@ def make_index_page():
             q3_money="${:,.2f}".format(q3_money),
             std_money="${:,.2f}".format(std_money),
             column_names=column_names,  # Updated column names
-            row_data=list(df.values.tolist()),
+            row_data=df.to_numpy().tolist(),
             link_column="Account Link",  # Update link column
             update_time=datetime.utcnow()
             .astimezone(ZoneInfo("US/Pacific"))
@@ -359,7 +384,7 @@ def process_single_user(args):
         latest_df,
     ) = args
 
-    if player_name not in latest_df["Account Name"].values:
+    if player_name not in latest_df.get_column("Account Name").to_list():
         return None
 
     player_money = []
@@ -367,25 +392,15 @@ def process_single_user(args):
 
     # Extract data for this player from all timepoints
     for df in all_dfs:
-        if player_name in df["Account Name"].values:
-            rankings.append(
-                float(df.loc[df["Account Name"] == player_name, "Ranking"].values[0])
-            )
-            player_money.append(
-                float(
-                    df.loc[
-                        df["Account Name"] == player_name, "Money In Account"
-                    ].values[0]
-                )
-            )
+        if player_name in df.get_column("Account Name").to_list():
+            player_row = df.filter(pl.col("Account Name") == player_name)
+            rankings.append(float(player_row.get_column("Ranking")[0]))
+            player_money.append(float(player_row.get_column("Money In Account")[0]))
 
     # Get player details from latest data
-    investopedia_link = latest_df.loc[
-        latest_df["Account Name"] == player_name, "Investopedia Link"
-    ].values[0]
-    player_stocks_data = latest_df.loc[
-        latest_df["Account Name"] == player_name, "Stocks Invested In"
-    ].iloc[0]
+    player_row = latest_df.filter(pl.col("Account Name") == player_name)
+    investopedia_link = player_row.get_column("Investopedia Link")[0]
+    player_stocks_data = player_row.get_column("Stocks Invested In")[0]
 
     # Process stock data
     player_stocks = [
@@ -522,18 +537,27 @@ def make_user_pages(usernames):
             with open(file, "r") as f:
                 dict_leaderboard = json.load(f)
             # ...existing DataFrame processing code...
-            df = pd.DataFrame.from_dict(dict_leaderboard, orient="index")
-            df.reset_index(level=0, inplace=True)
+            df = pl.DataFrame(
+                [
+                    {
+                        "Account Name": k,
+                        "Money In Account": v[0],
+                        "Investopedia Link": v[1],
+                        "Stocks Invested In": v[2] if len(v) > 2 else [],
+                    }
+                    for k, v in dict_leaderboard.items()
+                ]
+            )
+            df = df.sort("Money In Account", descending=True)
             if len(df.columns) == 3:
-                df["Stocks Invested In"] = [0 for i in range(len(df))]
-            df.columns = [
-                "Account Name",
-                "Money In Account",
-                "Investopedia Link",
-                "Stocks Invested In",
-            ]
-            df = df.sort_values(by=["Money In Account"], ascending=False)
-            df["Ranking"] = range(1, 1 + len(df))
+                df = df.with_columns(
+                    pl.Series(
+                        name="Stocks Invested In", values=[0 for i in range(len(df))]
+                    )
+                )
+            df = df.with_columns(
+                pl.Series(name="Ranking", values=range(1, len(df) + 1))
+            )
             all_dfs.append(df)
 
         # Get latest df for stock information
@@ -545,34 +569,22 @@ def make_user_pages(usernames):
             rankings = []
 
             # Check if player exists in latest data
-            if player_name not in latest_df["Account Name"].values:
+            if player_name not in latest_df.get_column("Account Name").to_list():
                 continue
 
             # Extract data for this player from all timepoints
             for df in all_dfs:
-                if player_name in df["Account Name"].values:
-                    rankings.append(
-                        float(
-                            df.loc[df["Account Name"] == player_name, "Ranking"].values[
-                                0
-                            ]
-                        )
-                    )
+                if player_name in df.get_column("Account Name").to_list():
+                    player_row = df.filter(pl.col("Account Name") == player_name)
+                    rankings.append(float(player_row.get_column("Ranking")[0]))
                     player_money.append(
-                        float(
-                            df.loc[
-                                df["Account Name"] == player_name, "Money In Account"
-                            ].values[0]
-                        )
+                        float(player_row.get_column("Money In Account")[0])
                     )
 
             # Get player details from latest data
-            investopedia_link = latest_df.loc[
-                latest_df["Account Name"] == player_name, "Investopedia Link"
-            ].values[0]
-            player_stocks_data = latest_df.loc[
-                latest_df["Account Name"] == player_name, "Stocks Invested In"
-            ].iloc[0]
+            player_row = latest_df.filter(pl.col("Account Name") == player_name)
+            investopedia_link = player_row.get_column("Investopedia Link")[0]
+            player_stocks_data = player_row.get_column("Stocks Invested In")[0]
 
             # Process stock data
             player_stocks = [
@@ -621,11 +633,11 @@ def make_user_pages(usernames):
             for name in usernames
         ]
 
-        # Process users in parallel
+        # Process users in parallel using spawn context
         num_processes = min(
             cpu_count(), len(usernames)
         )  # Don't create more processes than users
-        with Pool(processes=num_processes) as pool:
+        with MULTIPROCESSING_CONTEXT.Pool(processes=num_processes) as pool:
             results = pool.map(process_single_user, process_args)
 
         # Write results to files
