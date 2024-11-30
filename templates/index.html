@@ -131,6 +131,50 @@
             color: #fff;
         }
     }
+
+    /* Add new sorting icon styles */
+    .sort-icon {
+        display: inline-block;
+        width: 0;
+        height: 0;
+        margin-left: 0.5em;
+        border-left: 4px solid transparent;
+        border-right: 4px solid transparent;
+    }
+
+    .sort-icon.asc {
+        border-bottom: 4px solid currentColor;
+        border-top: none;
+    }
+
+    .sort-icon.desc {
+        border-top: 4px solid currentColor;
+        border-bottom: none;
+    }
+
+    .sort-icon.both {
+        position: relative;
+    }
+
+    .sort-icon.both::before {
+        content: '';
+        position: absolute;
+        left: -4px;
+        top: -6px;
+        border-left: 4px solid transparent;
+        border-right: 4px solid transparent;
+        border-bottom: 4px solid currentColor;
+    }
+
+    .sort-icon.both::after {
+        content: '';
+        position: absolute;
+        left: -4px;
+        bottom: -6px;
+        border-left: 4px solid transparent;
+        border-right: 4px solid transparent;
+        border-top: 4px solid currentColor;
+    }
 </style>
 {% endblock %}
 
@@ -295,11 +339,11 @@
             <table class="w-full" id="rankings">
                 <thead class="hidden md:table-header-group">
                     <tr>
-                        <th class="px-4 py-2">Rank</th>
-                        <th class="px-4 py-2">Account</th>
-                        <th class="hidden md:table-cell px-4 py-2">Account Value</th>
-                        <th class="hidden md:table-cell px-4 py-2">Stocks Invested</th>
-                        <th class="hidden md:table-cell px-4 py-2">Z-Score</th>
+                        <th class="px-4 py-2 no-sort">Rank</th>
+                        <th class="px-4 py-2 no-sort">Account</th>
+                        <th class="hidden md:table-cell px-4 py-2 no-sort">Account Value</th>
+                        <th class="hidden md:table-cell px-4 py-2 no-sort">Stocks Invested</th>
+                        <th class="hidden md:table-cell px-4 py-2 no-sort">Z-Score</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -724,6 +768,85 @@
                     }
                 });
             }
+        });
+    });
+
+    // Add table sorting functionality 
+    document.addEventListener('DOMContentLoaded', function() {
+        function getTableCellValue(tr, idx) {
+            const td = tr.children[idx];
+            const text = td.innerText || td.textContent;
+            
+            // If cell contains a link, get text from the link
+            const link = td.querySelector('a');
+            if (link) return link.textContent.toLowerCase();
+            
+            // Handle currency values (e.g. $1,234.56)
+            if (text.includes('$')) {
+                return parseFloat(text.replace(/[$,]/g, ''));
+            }
+            
+            // Handle percentage values (e.g. +12.34% or -12.34%)
+            if (text.includes('%')) {
+                return parseFloat(text.replace(/[+%]/g, ''));
+            }
+
+            // If the text can be parsed as a number, return a number
+            const num = parseFloat(text.replace(/,/g, ''));
+            return isNaN(num) ? text.toLowerCase() : num;
+        }
+
+        function comparer(idx, asc) {
+            return function(a, b) {
+                const valA = getTableCellValue(asc ? a : b, idx);
+                const valB = getTableCellValue(asc ? b : a, idx);
+                
+                // Compare numbers
+                if (typeof valA === 'number' && typeof valB === 'number') {
+                    return valA - valB;
+                }
+                
+                // Compare strings
+                return String(valA).localeCompare(String(valB), undefined, {
+                    numeric: true,
+                    sensitivity: 'base'
+                });
+            };
+        }
+
+        // Add sorting to all tables
+        document.querySelectorAll('table').forEach(table => {
+            const thead = table.querySelector('thead');
+            if (!thead) return; // Skip tables without headers
+            
+            const headers = thead.querySelectorAll('th');
+            headers.forEach((th, idx) => {
+                if (th.classList.contains('no-sort')) return;
+                
+                // Add sort indicators and styling
+                th.style.cursor = 'pointer';
+                const span = document.createElement('span');
+                span.className = 'sort-icon both';
+                th.appendChild(span);
+                
+                let ascending = true;
+                
+                th.addEventListener('click', () => {
+                    const tbody = table.querySelector('tbody');
+                    Array.from(tbody.querySelectorAll('tr'))
+                        .sort(comparer(idx, ascending = !ascending))
+                        .forEach(tr => tbody.appendChild(tr));
+
+                    // Update all sort icons to neutral state
+                    headers.forEach(h => {
+                        const icon = h.querySelector('.sort-icon');
+                        if (icon) icon.className = 'sort-icon both';
+                    });
+
+                    // Update clicked header's icon
+                    span.className = `sort-icon ${ascending ? 'asc' : 'desc'}`;
+                });
+            });
         });
     });
 
