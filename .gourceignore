@@ -1,9 +1,0 @@
-\.json$
-\.pyc$
-\.csv$
-\.pdf$ 
-\.html$
-__pycache__/
-\.cache/
-\.pixi/
-data/
