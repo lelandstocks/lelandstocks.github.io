@@ -1,0 +1,14 @@
+html
+<Person1> "Welcome to Quicksilver Podcast - Where Innovation Meets Mr. Miller's class. Today, we're diving into the chaotic world of stock trading in Mr. Miller's class. Let's get started!"
+</Person1><Person2> "Absolutely, let's talk about these portfolios. I mean, some of these students are making moves that would make Wall Street veterans blush!"
+</Person2><Person1> "Right? Take 'teachermiller' for instance. Sitting at $110,752.48 with a portfolio that's all over the place. I mean, AHR is up 35.84%, but AZI is down a whopping 46.58%. It's like a rollercoaster ride!"
+</Person1><Person2> "Yeah, and don't even get me started on '1mostafavidaniel'. Their portfolio is at $102,409.68. It's like they can't decide whether to ride the wave with CAVA at 44.36% or sink with NOC at -4.57%."
+</Person2><Person1> "And then there's '1byakodvedika' with $106,862.98. They've got NVDA up by 12.25%, but it's like they're playing it safe with SPY and TQQQ. Not much excitement there."
+</Person1><Person2> "But you know who's really playing the game? '1nguyenkatie' at $110,299.02. They've got a solid mix with AMZN up 13.94% and TSLA at 45.37%. It's like they're trying to cover all bases."
+</Person2><Person1> "True, but let's not forget '1paliwalpinak'. Sitting pretty at $129,691.88 with a single stock, NVDL, down 11.71%. It's like watching someone put all their eggs in one basket and then drop it."
+</Person1><Person2> "And what about 'miatarabichi'? They're at $145,342.80 with a portfolio that's a mix of high-flyers like MSTR at 127.69% and some questionable choices like AVGO down 0.75%."
+</Person2><Person1> "It's fascinating, really. And then there's '3yanjoshua' at $73,759.88, who seems to have put all their chips on AMDL, which is down 22.90%. It's like they're betting on a miracle."
+</Person1><Person2> "Exactly, and '2baradlayannie' at $104,180.63 is another interesting case. They've got a diverse portfolio with AAPL and DUOL doing well, but it's like they're trying to juggle too many balls at once."
+</Person2><Person1> "And then there's the wildcard, '1enriquezmario', with a staggering $196,254.62, thanks to LUNR at 60.53%. It's like they hit the jackpot with a single stock."
+</Person1><Person2> "It's a wild ride, for sure. But hey, that's the stock market for you. Unpredictable, volatile, and sometimes downright insane."
+</Person2><Person1> "Absolutely. Well, that's all the time we have for today. Thanks for tuning in to Quicksilver Podcast - Where Innovation Meets Mr. Miller's class. Until next time, keep trading and stay sharp!"</Person1>
