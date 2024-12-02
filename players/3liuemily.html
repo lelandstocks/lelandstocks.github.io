@@ -104,7 +104,7 @@
             </div>
             <div class="text-left sm:text-right">
                 <p class="text-white/80 text-sm">Last Updated</p>
-                <p class="text-base sm:text-lg">13:33:11 12-02-2024</p>
+                <p class="text-base sm:text-lg">13:50:09 12-02-2024</p>
             </div>
         </div>
     </div>
@@ -112,7 +112,7 @@
 
 <!-- Main Grid Layout -->
 <div class="container mx-auto px-4">
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 min-h-[calc(100vh-12rem)]">
         <!-- Left Panel -->
         <div class="lg:col-span-3 space-y-4 order-2 lg:order-1">
             <!-- Performance Cards -->
@@ -183,10 +183,10 @@
 
         <!-- Right Panel (Chart) -->
         <div class="lg:col-span-9 order-1 lg:order-2">
-            <div class="bg-card rounded-lg shadow p-4 sm:p-6 h-[50vh] lg:h-[calc(100vh-12rem)]">
+            <div class="bg-card rounded-lg shadow p-4 sm:p-6 h-full min-h-[400px] lg:min-h-[500px]">
                 <!-- Chart Controls -->
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-                    <div class="legend grid grid-cols-3 sm:flex sm:flex-row gap-2">
+                    <div class="legend grid grid-cols-2 xs:grid-cols-3 sm:flex sm:flex-row gap-2 w-full sm:w-auto">
                         
                         <button class="uk-button uk-button-default px-3 py-1 text-sm legend-button active" data-series="portfolio">
                             <span class="inline-block w-2 h-2 rounded-full mr-1" style="background: rgb(75, 192, 192)"></span>
@@ -214,7 +214,7 @@
                         </button>
                         
                     </div>
-                    <div class="flex flex-wrap gap-2">
+                    <div class="flex flex-wrap gap-2 justify-center sm:justify-start">
                         <button class="uk-button uk-button-default px-3 py-1 text-sm" id="resetZoom">Reset</button>
                         
                         <button class="uk-button uk-button-default px-3 py-1 text-sm time-range" data-days="1">1D</button>
@@ -230,7 +230,7 @@
                 
                 <!-- Chart Container -->
                 <div class="h-[calc(100%-4rem)]" id="chartContainer">
-                    <div id="playerChart"></div>
+                    <div id="playerChart" class="w-full h-full"></div>
                 </div>
             </div>
         </div>
@@ -440,11 +440,18 @@
 
     chart.timeScale().fitContent();
 
+    // Improve resize handler
+    let resizeTimeout;
     window.addEventListener('resize', () => {
-        chart.applyOptions({
-            width: chartContainer.offsetWidth,
-            height: chartContainer.offsetHeight
-        });
+        if (resizeTimeout) clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            const parent = chartContainer.parentElement;
+            chart.applyOptions({
+                width: parent.offsetWidth,
+                height: parent.offsetHeight
+            });
+            chart.timeScale().fitContent();
+        }, 100);
     });
 
     // Add reset zoom button functionality
