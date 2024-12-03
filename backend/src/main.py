@@ -1,6 +1,6 @@
 import json
 import os
-from datetime import datetime, timedelta
+from datetime import datetime
 import pickle
 import random
 import asyncio
@@ -216,14 +216,7 @@ async def process_single_account(context, url):
 
 
 async def get_account_information():
-    """Returns a dictionary with all of the account values within it, using cache when possible"""
-    # Check cache first
-    if os.path.exists(ACCOUNT_CACHE_FILE):
-        cache_time = datetime.fromtimestamp(os.path.getmtime(ACCOUNT_CACHE_FILE))
-        if datetime.now() - cache_time < timedelta(minutes=ACCOUNT_CACHE_EXPIRE_MINS):
-            with open(ACCOUNT_CACHE_FILE, "rb") as f:
-                return pickle.load(f)
-
+    """Returns a dictionary with all of the account values within it"""
     print("Loading portfolio URLs...")
     account_information = {}
     urls = []

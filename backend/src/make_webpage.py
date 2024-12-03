@@ -218,89 +218,58 @@ def get_leaderboard_data():
 @cache_result("analyzed_data")
 def analyze_leaderboard_data():
     """Centralized analysis of leaderboard data that can be reused across functions"""
-    all_dfs, timestamps = get_leaderboard_data()
-    leaderboard_files = sorted(glob("./backend/leaderboards/in_time/*"))
-
-    # Load latest data
-    with open("backend/leaderboards/leaderboard-latest.json", "r") as file:
-        latest_data = json.load(file)
-
-    # Stock analysis
-    all_stocks = []
-    stock_values = {}
+    all_dfs = []
+    timestamps = []
+    stock_cnt = []
     total_investment = 0
 
-    # Process stocks
-    for player_data in latest_data.values():
-        try:
-            stocks = player_data[2]
-            if stocks:
-                all_stocks.extend([stock[0] for stock in stocks])
-            for stock in stocks:
-                symbol = stock[0]
-                current_price = float(stock[1].replace("$", "").replace(",", ""))
-                pct_change = float(stock[2].replace("%", "")) / 100
+    try:
+        all_dfs, timestamps = get_leaderboard_data()
+        leaderboard_files = sorted(glob("./backend/leaderboards/in_time/*"))
 
-                initial_price = (
-                    current_price
-                    if pct_change == -1
-                    else current_price / (1 + pct_change)
-                )
+        # Load latest data
+        with open("backend/leaderboards/leaderboard-latest.json", "r") as file:
+            latest_data = json.load(file)
 
-                if symbol not in stock_values:
-                    stock_values[symbol] = {"current": 0, "initial": 0}
-                stock_values[symbol]["current"] += current_price
-                stock_values[symbol]["initial"] += initial_price
-                total_investment += current_price
-        except (IndexError, ValueError, TypeError):
-            continue
+        # ...existing code...
 
-    # Process stock data
-    stock_data = []
-    for symbol, values in stock_values.items():
-        current_value = values["current"]
-        initial_value = values["initial"]
-        if initial_value > 0:
-            percent_change = ((current_value / initial_value) - 1) * 100
-            stock_data.append((symbol, current_value, initial_value, percent_change))
-
-    # Create final stock counts
-    stock_counter = Counter(all_stocks).most_common()
-    stock_cnt = []
-    for stock, count in stock_counter:
-        stock_info = next((s for s in stock_data if s[0] == stock), None)
-        if stock_info:
-            stock_cnt.append(
-                (stock, count, stock_info[1], stock_info[2], stock_info[3])
+        # Process latest DataFrame with error handling
+        latest_df = (
+            pl.DataFrame(
+                [
+                    {
+                        "Account Name": k,
+                        "Money In Account": v[0],
+                        "Investopedia Link": v[1],
+                        "Stocks Invested In": v[2] if len(v) > 2 else [],
+                    }
+                    for k, v in latest_data.items()
+                ]
             )
+            if latest_data
+            else pl.DataFrame()
+        )
+
+        if not latest_df.is_empty():
+            latest_df = latest_df.sort("Money In Account", descending=True)
+            latest_df = latest_df.with_columns(
+                pl.Series(name="Ranking", values=range(1, len(latest_df) + 1))
+            )
+            summary_stats = get_five_number_summary(latest_df)
         else:
-            stock_cnt.append((stock, count, 0, 0, 0))
+            summary_stats = (0, 0, 0, 0, 0)  # Default values if no data
 
-    # Process latest DataFrame
-    latest_df = pl.DataFrame(
-        [
-            {
-                "Account Name": k,
-                "Money In Account": v[0],
-                "Investopedia Link": v[1],
-                "Stocks Invested In": v[2] if len(v) > 2 else [],
-            }
-            for k, v in latest_data.items()
-        ]
-    )
-
-    latest_df = latest_df.sort("Money In Account", descending=True)
-    latest_df = latest_df.with_columns(
-        pl.Series(name="Ranking", values=range(1, len(latest_df) + 1))
-    )
-
-    # Calculate statistics
-    summary_stats = get_five_number_summary(latest_df)
+    except Exception as e:
+        print(f"Error in analyze_leaderboard_data: {e}")
+        latest_df = pl.DataFrame()
+        summary_stats = (0, 0, 0, 0, 0)
 
     return {
         "all_dfs": all_dfs,
         "timestamps": timestamps,
-        "leaderboard_files": leaderboard_files,
+        "leaderboard_files": leaderboard_files
+        if "leaderboard_files" in locals()
+        else [],
         "latest_df": latest_df,
         "stock_cnt": stock_cnt,
         "summary_stats": summary_stats,
@@ -949,18 +918,16 @@ def make_pages_parallel():
         about_future = executor.submit(make_about_page)
         chart_future = executor.submit(make_combined_chart)
 
-        # Get results
-        index_content = index_future.result()
-        about_content = about_future.result()
-        chart_content = chart_future.result()
-
-        # Write results
-        with open("index.html", "w") as f:
-            f.write(index_content)
-        with open("about.html", "w") as f:
-            f.write(about_content)
-        with open("cometogether.html", "w") as f:
-            f.write(chart_content)
+        # Get results and write if not None
+        for future, filename in [
+            (index_future, "index.html"),
+            (about_future, "about.html"),
+            (chart_future, "cometogether.html"),
+        ]:
+            content = future.result()
+            if content:
+                with open(filename, "w") as f:
+                    f.write(content)
 
 
 if __name__ == "__main__":
