@@ -17,6 +17,7 @@
         border-radius: 0.5rem;
         box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         padding: 1.5rem;
+        min-height: 200px; /* Add this line */
     }
 
     .chart-wrapper {
@@ -347,6 +348,12 @@
         .uk-table-responsive th {
             padding: 0.25rem;
         }
+    }
+
+    /* Update the max-height for the scrollable content */
+    #summaryContent, #stocksContent {
+        max-height: 140px; /* Adjust to account for header space */
+        overflow-y: auto;
     }
 </style>
 {% endblock %}
