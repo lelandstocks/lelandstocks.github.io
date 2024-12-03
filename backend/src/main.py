@@ -1,6 +1,6 @@
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 import pickle
 import random
 import asyncio
@@ -13,9 +13,10 @@ from make_webpage import (
     make_index_page,
     make_user_pages,
     make_about_page,
-    make_combined_chart,
+    make_pages_parallel,
 )
 from make_podcast import generate_podcast_audio
+from tqdm import tqdm
 
 load_dotenv()
 
@@ -80,6 +81,9 @@ async def login(page):
 # Add after imports
 SCREENSHOT_DIR = "./backend/screenshots"
 os.makedirs(SCREENSHOT_DIR, exist_ok=True)
+
+ACCOUNT_CACHE_FILE = "./backend/cache/account_info.pickle"
+ACCOUNT_CACHE_EXPIRE_MINS = 5
 
 
 async def process_single_account(context, url):
@@ -212,15 +216,23 @@ async def process_single_account(context, url):
 
 
 async def get_account_information():
-    """Returns a dictionary with all of the account values within it"""
+    """Returns a dictionary with all of the account values within it, using cache when possible"""
+    # Check cache first
+    if os.path.exists(ACCOUNT_CACHE_FILE):
+        cache_time = datetime.fromtimestamp(os.path.getmtime(ACCOUNT_CACHE_FILE))
+        if datetime.now() - cache_time < timedelta(minutes=ACCOUNT_CACHE_EXPIRE_MINS):
+            with open(ACCOUNT_CACHE_FILE, "rb") as f:
+                return pickle.load(f)
+
+    print("Loading portfolio URLs...")
     account_information = {}
     urls = []
 
     with open("./backend/portfolios/portfolios.txt", "r") as file:
         urls = [line.strip() for line in file]
 
-    # Create semaphore to limit concurrent tabs
-    semaphore = asyncio.Semaphore(8)  # Reduced from 16 since we're using tabs
+    print(f"Processing {len(urls)} accounts...")
+    semaphore = asyncio.Semaphore(8)
 
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
@@ -230,22 +242,192 @@ async def get_account_information():
             async with semaphore:
                 res = await process_single_account(context, url)
                 while res == "retry":
-                    print("Retrying...", url)
+                    print(f"\nRetrying... {url}")
                     res = await process_single_account(context, url)
                 return res
 
         try:
             tasks = [process_with_semaphore(url) for url in urls]
-            results = await asyncio.gather(*tasks)
 
-            for result in results:
-                if result:
-                    account_name, account_data = result
-                    account_information[account_name] = account_data
+            # Create progress bar for tasks
+            with tqdm(total=len(tasks), desc="Scraping accounts") as pbar:
+                for task in asyncio.as_completed(tasks):
+                    result = await task
+                    if result:
+                        account_name, account_data = result
+                        account_information[account_name] = account_data
+                    pbar.update(1)
         finally:
             await browser.close()
 
+    print("\nCaching results...")
+    with open(ACCOUNT_CACHE_FILE, "wb") as f:
+        pickle.dump(account_information, f)
+
     return account_information
+
+
+# Create a context manager for browser sessions
+class PlaywrightContextManager:
+    def __init__(self):
+        self.playwright = None
+        self.browser = None
+        self.context = None
+
+    async def __aenter__(self):
+        self.playwright = await async_playwright().start()
+        self.browser = await self.playwright.chromium.launch(headless=True)
+        self.context = await self.browser.new_context(
+            user_agent=get_random_user_agent()
+        )
+        return self.context
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        await self.context.close()
+        await self.browser.close()
+        await self.playwright.stop()
+
+
+# # Modify process_single_account to use the context manager
+# async def process_single_account(context, url):
+#     async with PlaywrightContextManager() as context:
+#         page = await context.new_page()
+
+#         try:
+#             # First attempt
+#             await login(page)
+#             await page.goto(url, wait_until="domcontentloaded")
+#             print(page.url)
+#             account_name = ""
+#             try:
+#                 # Wait for account value and name to be present
+#                 await page.wait_for_selector(
+#                     '[data-cy="account-value-text"]', timeout=300000
+#                 )
+#                 await page.wait_for_selector(
+#                     '[data-cy="user-portfolio-name"]', timeout=300000
+#                 )
+
+#                 account_value = await page.text_content(
+#                     '[data-cy="account-value-text"]'
+#                 )
+#                 account_value = float(account_value.replace("$", "").replace(",", ""))
+#                 account_name = await page.text_content(
+#                     '[data-cy="user-portfolio-name"]'
+#                 )
+#                 account_name = account_name.replace(" Portfolio", "").strip()
+#             except Exception as e:
+#                 print("First attempt failed, trying again with fresh login...")
+#                 await context.clear_cookies()
+#                 await login(page)
+#                 await page.goto(url, wait_until="domcontentloaded")
+
+#                 # Wait for account value and name to be present on second attempt
+#                 await page.wait_for_selector(
+#                     '[data-cy="account-value-text"]', timeout=300000
+#                 )
+#                 await page.wait_for_selector(
+#                     '[data-cy="user-portfolio-name"]', timeout=300000
+#                 )
+
+#                 account_value = await page.text_content(
+#                     '[data-cy="account-value-text"]'
+#                 )
+#                 account_value = float(account_value.replace("$", "").replace(",", ""))
+#                 account_name = await page.text_content(
+#                     '[data-cy="user-portfolio-name"]'
+#                 )
+#                 account_name = account_name.replace(" Portfolio", "").strip()
+#                 with open("logs/log.txt", "a") as file:
+#                     file.write(
+#                         f" {datetime.now()} First attempt failed, trying again with fresh login, specific error was {e}\n"
+#                     )
+#             # Wait for table to be fully loaded
+#             await page.wait_for_selector(
+#                 "table tr td", timeout=300000
+#             )  # Wait for at least one table cell
+#             await page.wait_for_function(
+#                 """
+#                 () => {
+#                     const rows = document.querySelectorAll('table tr');
+#                     return rows.length > 1 && rows[1].querySelectorAll('td').length > 0;
+#                 }
+#             """,
+#                 timeout=300000,
+#             )
+
+#             # Get stock data from table
+#             stock_data = []
+#             rows = await page.query_selector_all("table tr")
+
+#             print(f"\nProcessing account: {account_name}")
+#             print("Table rows found:", len(rows))
+
+#             if len(rows) > 1:  # Skip header row
+#                 for i, row in enumerate(rows[1:], 1):
+#                     try:
+#                         # # Print entire row content for debugging
+#                         # all_cells = await row.query_selector_all("td")
+#                         # raw_row_data = []
+#                         # for cell in all_cells:
+#                         #     content = await cell.text_content()
+#                         #     raw_row_data.append(content.strip())
+#                         # print(f"Row {i} raw data:", raw_row_data)
+
+#                         symbol = await row.query_selector("td:nth-child(1)")
+#                         total_amount_of_money = await row.query_selector(
+#                             "td:nth-child(7)"
+#                         )
+#                         gain_pct = await row.query_selector("td:nth-child(8)")
+#                         # print(await symbol.text_content(), await last_price.text_content(), await gain_pct.text_content())
+#                         if symbol and total_amount_of_money and gain_pct:
+#                             symbol_text = (await symbol.text_content()).strip()
+#                             price_text = (
+#                                 await total_amount_of_money.text_content()
+#                             ).strip()
+#                             gain_text = (await gain_pct.text_content()).strip()
+#                             # Clean up gain percentage text
+#                             gain_text = gain_text.replace("\n", "").replace(" ", "")
+#                             gain_parts = gain_text.split("(")
+#                             if len(gain_parts) > 1:
+#                                 gain_text = gain_parts[1].replace(")", "")
+#                             if symbol_text and price_text and gain_text:
+#                                 stock_data.append([symbol_text, price_text, gain_text])
+#                                 print(
+#                                     f"Processed stock for {account_name}: {symbol_text}____{price_text}____ {gain_text}"
+#                                 )
+#                     except Exception as e:
+#                         print(f"Error parsing row: {e}")
+#                         continue
+
+#             # if not stock_data:
+#             #     # Take a screenshot if no stocks are discovered
+#             #     timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+#             #     screenshot_path = os.path.join(
+#             #         SCREENSHOT_DIR, f"no_stocks_{timestamp}_{url.split('/')[-1]}.png"
+#             #     )
+#             #     await page.screenshot(path=screenshot_path, full_page=True)
+#             #     stock_data = []
+
+#             return account_name.strip(), [
+#                 account_value,
+#                 url.strip(),
+#                 stock_data,
+#             ]  # Added strip()
+#         except Exception as e:
+#             print(f"Error processing account {url}: {str(e)}")
+#             with open("logs/log.txt", "a") as file:
+#                 file.write(
+#                     f"Error processing account {url}: {str(e)}, {datetime.now()}\n"
+#                 )
+#             timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+#             screenshot_path = os.path.join(
+#                 SCREENSHOT_DIR, f"error_{timestamp}_{url.split('/')[-1]}.png"
+#             )
+#             await page.screenshot(path=screenshot_path, full_page=True)
+#             return "retry"
+#         finally:
+#             await page.close()  # Close tab instead of browser
 
 
 # Main execution block
@@ -261,8 +443,10 @@ async def main():
         if (
             is_trading_hours or os.environ.get("FORCE_UPDATE") == "True"
         ) and os.environ.get("DONT_UPDATE") != "True":
+            print("Starting account information update...")
             account_values = await get_account_information()
 
+            print("Writing leaderboard files...")
             file_name = f"./backend/leaderboards/out_of_time/leaderboard-{curr_time.strftime('%Y-%m-%d-%H_%M')}.json"
             if is_trading_hours:
                 file_name = f"./backend/leaderboards/in_time/leaderboard-{curr_time.strftime('%Y-%m-%d-%H_%M')}.json"
@@ -279,19 +463,10 @@ async def main():
         else:
             print("Update disabled")
 
-        # Update index.html
-        with open("index.html", "w") as file:
-            file.write(make_index_page())
+        print("Updating web pages...")
+        make_pages_parallel()  # Replace individual page generations with parallel version
 
-        # Update about.html
-        with open("about.html", "w") as file:
-            file.write(make_about_page())
-
-        # Generate combined chart page
-        with open("cometogether.html", "w") as file:
-            file.write(make_combined_chart())
-
-        # Read usernames and generate all pages at once
+        print("Generating user pages...")
         with open("./backend/portfolios/usernames.txt", "r") as file:
             usernames = [user.strip() for user in file.readlines()]
             make_user_pages(usernames)

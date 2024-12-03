@@ -4,6 +4,9 @@ from collections import Counter
 from datetime import datetime, timedelta
 from glob import glob
 from multiprocessing import cpu_count, get_context
+import functools
+import pickle
+from concurrent.futures import ThreadPoolExecutor
 
 import flask
 import polars as pl  # Replace pandas with polars
@@ -12,6 +15,7 @@ from flask import render_template
 from scipy.stats import zscore
 from zoneinfo import ZoneInfo
 import yfinance as yf
+from tqdm import tqdm
 
 # this whole file is to render the html table
 app = flask.Flask("leaderboard")
@@ -19,20 +23,84 @@ app = flask.Flask("leaderboard")
 # Set multiprocessing to use 'spawn' for Polars compatibility
 MULTIPROCESSING_CONTEXT = get_context("spawn")
 
+# Add cache directory
+CACHE_DIR = "./backend/cache"
+os.makedirs(CACHE_DIR, exist_ok=True)
 
-def get_five_number_summary(df):
-    # Update summary statistics using polars
-    money_series = df.get_column("Money In Account")
-    average_money = money_series.mean()
-    q1_money = money_series.quantile(0.25)
-    median_money = money_series.quantile(0.5)
-    q3_money = money_series.quantile(0.75)
-    std_money = money_series.std()
-    return average_money, q1_money, median_money, q3_money, std_money
+# Add cache for rendered pages
+RENDER_CACHE_DIR = "./backend/cache/rendered"
+os.makedirs(RENDER_CACHE_DIR, exist_ok=True)
 
 
+def cache_result(cache_key, expire_hours=1):
+    """Decorator to cache function results"""
+
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            cache_file = os.path.join(CACHE_DIR, f"{cache_key}.pickle")
+
+            # Check if cache exists and is fresh
+            if os.path.exists(cache_file):
+                cache_time = datetime.fromtimestamp(os.path.getmtime(cache_file))
+                if datetime.now() - cache_time < timedelta(hours=expire_hours):
+                    with open(cache_file, "rb") as f:
+                        return pickle.load(f)
+
+            # Execute function and cache result
+            result = func(*args, **kwargs)
+            with open(cache_file, "wb") as f:
+                pickle.dump(result, f)
+            return result
+
+        return wrapper
+
+    return decorator
+
+
+def cache_rendered_page(page_name, content, expire_hours=1):
+    """Cache rendered page content"""
+    cache_file = os.path.join(RENDER_CACHE_DIR, f"{page_name}.html")
+    with open(cache_file, "w") as f:
+        f.write(content)
+
+
+def get_cached_page(page_name, expire_hours=1):
+    """Get cached page content if fresh"""
+    cache_file = os.path.join(RENDER_CACHE_DIR, f"{page_name}.html")
+    if os.path.exists(cache_file):
+        cache_time = datetime.fromtimestamp(os.path.getmtime(cache_file))
+        if datetime.now() - cache_time < timedelta(hours=expire_hours):
+            with open(cache_file, "r") as f:
+                return f.read()
+    return None
+
+
+def render_parallel(template_name, **kwargs):
+    """Render template with caching"""
+    cache_key = f"{template_name}_{hash(str(kwargs))}"
+
+    # Check cache first
+    cached = get_cached_page(cache_key)
+    if cached:
+        return cached
+
+    # Render if not cached
+    with app.app_context():
+        rendered = render_template(template_name, **kwargs)
+        cache_rendered_page(cache_key, rendered)
+        return rendered
+
+
+@cache_result("price_data")
+def fetch_price_data(start_date, end_date, symbols):
+    """Fetch and cache price data for multiple symbols"""
+    return yf.download(symbols, start=start_date, end=end_date, interval="15m")
+
+
+@cache_result("trading_timestamps")
 def generate_trading_timestamps(start_date, end_date):
-    """Generate 5-minute interval timestamps during trading hours (9:30 AM - 4:00 PM EST)"""
+    """Cache trading timestamps to avoid regeneration"""
     timestamps = []
     current = start_date.replace(hour=9, minute=30, second=0, microsecond=0)
 
@@ -51,6 +119,17 @@ def generate_trading_timestamps(start_date, end_date):
         )
 
     return timestamps
+
+
+def get_five_number_summary(df):
+    # Update summary statistics using polars
+    money_series = df.get_column("Money In Account")
+    average_money = money_series.mean()
+    q1_money = money_series.quantile(0.25)
+    median_money = money_series.quantile(0.5)
+    q3_money = money_series.quantile(0.75)
+    std_money = money_series.std()
+    return average_money, q1_money, median_money, q3_money, std_money
 
 
 def interpolate_value(timestamps, data_times, data_values, target_time):
@@ -97,8 +176,149 @@ def get_previous_trading_day(date):
     return current
 
 
+def get_leaderboard_data():
+    """Centralized function to load and process leaderboard data"""
+    leaderboard_files = sorted(glob("./backend/leaderboards/in_time/*"))
+    all_dfs = []
+    timestamps = []
+
+    for file in leaderboard_files:
+        with open(file, "r") as f:
+            dict_leaderboard = json.load(f)
+
+        df = pl.DataFrame(
+            [
+                {
+                    "Account Name": k,
+                    "Money In Account": v[0],
+                    "Investopedia Link": v[1],
+                    "Stocks Invested In": v[2] if len(v) > 2 else [],
+                }
+                for k, v in dict_leaderboard.items()
+            ]
+        )
+
+        df = df.sort("Money In Account", descending=True)
+        if len(df.columns) == 3:
+            df = df.with_columns(
+                pl.Series(name="Stocks Invested In", values=[0 for i in range(len(df))])
+            )
+        df = df.with_columns(pl.Series(name="Ranking", values=range(1, len(df) + 1)))
+
+        file_name = os.path.basename(file)
+        date_time_str = file_name[len("leaderboard-") : -len(".json")]
+        date_time = datetime.strptime(date_time_str.replace("_", ":"), "%Y-%m-%d-%H:%M")
+
+        all_dfs.append(df)
+        timestamps.append(date_time)
+
+    return all_dfs, timestamps
+
+
+@cache_result("analyzed_data")
+def analyze_leaderboard_data():
+    """Centralized analysis of leaderboard data that can be reused across functions"""
+    all_dfs, timestamps = get_leaderboard_data()
+    leaderboard_files = sorted(glob("./backend/leaderboards/in_time/*"))
+
+    # Load latest data
+    with open("backend/leaderboards/leaderboard-latest.json", "r") as file:
+        latest_data = json.load(file)
+
+    # Stock analysis
+    all_stocks = []
+    stock_values = {}
+    total_investment = 0
+
+    # Process stocks
+    for player_data in latest_data.values():
+        try:
+            stocks = player_data[2]
+            if stocks:
+                all_stocks.extend([stock[0] for stock in stocks])
+            for stock in stocks:
+                symbol = stock[0]
+                current_price = float(stock[1].replace("$", "").replace(",", ""))
+                pct_change = float(stock[2].replace("%", "")) / 100
+
+                initial_price = (
+                    current_price
+                    if pct_change == -1
+                    else current_price / (1 + pct_change)
+                )
+
+                if symbol not in stock_values:
+                    stock_values[symbol] = {"current": 0, "initial": 0}
+                stock_values[symbol]["current"] += current_price
+                stock_values[symbol]["initial"] += initial_price
+                total_investment += current_price
+        except (IndexError, ValueError, TypeError):
+            continue
+
+    # Process stock data
+    stock_data = []
+    for symbol, values in stock_values.items():
+        current_value = values["current"]
+        initial_value = values["initial"]
+        if initial_value > 0:
+            percent_change = ((current_value / initial_value) - 1) * 100
+            stock_data.append((symbol, current_value, initial_value, percent_change))
+
+    # Create final stock counts
+    stock_counter = Counter(all_stocks).most_common()
+    stock_cnt = []
+    for stock, count in stock_counter:
+        stock_info = next((s for s in stock_data if s[0] == stock), None)
+        if stock_info:
+            stock_cnt.append(
+                (stock, count, stock_info[1], stock_info[2], stock_info[3])
+            )
+        else:
+            stock_cnt.append((stock, count, 0, 0, 0))
+
+    # Process latest DataFrame
+    latest_df = pl.DataFrame(
+        [
+            {
+                "Account Name": k,
+                "Money In Account": v[0],
+                "Investopedia Link": v[1],
+                "Stocks Invested In": v[2] if len(v) > 2 else [],
+            }
+            for k, v in latest_data.items()
+        ]
+    )
+
+    latest_df = latest_df.sort("Money In Account", descending=True)
+    latest_df = latest_df.with_columns(
+        pl.Series(name="Ranking", values=range(1, len(latest_df) + 1))
+    )
+
+    # Calculate statistics
+    summary_stats = get_five_number_summary(latest_df)
+
+    return {
+        "all_dfs": all_dfs,
+        "timestamps": timestamps,
+        "leaderboard_files": leaderboard_files,
+        "latest_df": latest_df,
+        "stock_cnt": stock_cnt,
+        "summary_stats": summary_stats,
+        "total_investment": total_investment,
+    }
+
+
 def make_index_page():
     with app.app_context():
+        # Get analyzed data
+        data = analyze_leaderboard_data()
+        df = data["latest_df"]
+        stock_cnt = data["stock_cnt"]
+        average_money, q1_money, median_money, q3_money, std_money = data[
+            "summary_stats"
+        ]
+
+        all_dfs, timestamps = get_leaderboard_data()
         leaderboard_files = sorted(glob("./backend/leaderboards/in_time/*"))
 
         # Load latest leaderboard first
@@ -407,7 +627,7 @@ def make_index_page():
                 )  # Assuming only one file
 
         # Render the html template as shown here: https://stackoverflow.com/a/56296451
-        rendered = render_template(
+        rendered = render_parallel(
             "index.html",
             average_money="${:,.2f}".format(average_money),
             q1_money="${:,.2f}".format(q1_money),
@@ -436,206 +656,17 @@ def make_index_page():
         return rendered
 
 
-def process_single_user(args):
-    """Helper function to process a single user's page"""
-    (
-        player_name,
-        labels,
-        all_dfs,
-        sp500_prices,
-        tqqq_prices,
-        nvda_prices,
-        djt_prices,
-        latest_df,
-    ) = args
+@cache_result("player_data")
+def process_all_player_data(all_dfs, latest_df):
+    """Process all player data at once and cache results"""
+    print("Processing player data...")
+    player_data = {}
 
-    if player_name not in latest_df.get_column("Account Name").to_list():
-        return None
-
-    player_money = []
-    rankings = []
-
-    # Extract data for this player from all timepoints
-    for df in all_dfs:
-        if player_name in df.get_column("Account Name").to_list():
-            player_row = df.filter(pl.col("Account Name") == player_name)
-            rankings.append(float(player_row.get_column("Ranking")[0]))
-            player_money.append(float(player_row.get_column("Money In Account")[0]))
-
-    # Get player details from latest data
-    player_row = latest_df.filter(pl.col("Account Name") == player_name)
-    investopedia_link = player_row.get_column("Investopedia Link")[0]
-    player_stocks_data = player_row.get_column("Stocks Invested In")[0]
-
-    # Process stock data
-    player_stocks = [
-        [
-            stock[0],
-            float(stock[1].replace("$", "").replace(",", "")),
-            float(stock[2].replace("%", "")),
-        ]
-        for stock in player_stocks_data
-    ]
-
-    with app.app_context():
-        rendered = render_template(
-            "player.html",
-            labels=labels,
-            player_money=player_money,
-            player_name=player_name,
-            investopedia_link=investopedia_link,
-            player_stocks=player_stocks,
-            update_time=datetime.utcnow()
-            .astimezone(ZoneInfo("US/Pacific"))
-            .strftime("%H:%M:%S %m-%d-%Y"),
-            sp500_prices=sp500_prices,
-            tqqq_prices=tqqq_prices,
-            nvda_prices=nvda_prices,
-            djt_prices=djt_prices,
-            zip=zip,
-        )
-
-    return player_name, rendered
-
-
-def make_user_pages(usernames):
-    """Generate HTML pages for multiple users in parallel"""
-    with app.app_context():
-        leaderboard_files = sorted(glob("./backend/leaderboards/in_time/*"))
-        labels = []
-        all_dfs = []
-        timestamps = []
-        sp500_prices = []
-        tqqq_prices = []
-        nvda_prices = []
-        djt_prices = []
-
-        # Get initial prices from August 20th, 2024 market close
-        initial_date = datetime(2024, 8, 20, tzinfo=ZoneInfo("America/New_York"))
-        initial_date = get_previous_trading_day(initial_date)
-        initial_prices = yf.download(
-            ["SPY", "TQQQ", "NVDA", "DJT"],
-            start=initial_date,
-            end=initial_date + timedelta(days=1),
-            interval="1h",
-        )
-        initial_sp500_price = float(initial_prices["Close"]["SPY"].iloc[0])
-        initial_tqqq_price = float(initial_prices["Close"]["TQQQ"].iloc[0])
-        initial_nvda_price = float(initial_prices["Close"]["NVDA"].iloc[0])
-        initial_djt_price = float(initial_prices["Close"]["DJT"].iloc[0])
-
-        # Collect timestamps and process files
-        for file in leaderboard_files:
-            file_name = os.path.basename(file)
-            date_time_str = file_name[len("leaderboard-") : -len(".json")]
-            date_time = datetime.strptime(
-                date_time_str.replace("_", ":"), "%Y-%m-%d-%H:%M"
-            )
-            timestamps.append(date_time)
-
-        # Fetch price data
-        start_date = min(timestamps).date()
-        end_date = max(timestamps).date() + timedelta(days=1)
-        price_data = yf.download(
-            ["SPY", "TQQQ", "NVDA", "DJT"],
-            start=start_date,
-            end=end_date,
-            interval="15m",
-        )
-
-        # Process each timestamp
-        for file, timestamp in zip(leaderboard_files, timestamps):
-            date_time_str = timestamp.strftime("%Y-%m-%dT%H:%M:%S")
-            labels.append(date_time_str)
-
-            # Get prices
-            date_for_price = timestamp.date()
-            try:
-                current_sp500_price = float(
-                    price_data["Close"]["SPY"].loc[date_for_price]
-                )
-                current_tqqq_price = float(
-                    price_data["Close"]["TQQQ"].loc[date_for_price]
-                )
-                current_nvda_price = float(
-                    price_data["Close"]["NVDA"].loc[date_for_price]
-                )
-                current_djt_price = float(
-                    price_data["Close"]["DJT"].loc[date_for_price]
-                )
-
-                sp500_price = 100000 * (current_sp500_price / initial_sp500_price)
-                tqqq_price = 100000 * (current_tqqq_price / initial_tqqq_price)
-                nvda_price = 100000 * (current_nvda_price / initial_nvda_price)
-                djt_price = 100000 * (current_djt_price / initial_djt_price)
-            except KeyError:
-                previous_dates = price_data.index[
-                    price_data.index.date <= date_for_price
-                ]
-                if len(previous_dates) > 0:
-                    current_sp500_price = float(
-                        price_data["Close"]["SPY"].loc[previous_dates[-1]]
-                    )
-                    current_tqqq_price = float(
-                        price_data["Close"]["TQQQ"].loc[previous_dates[-1]]
-                    )
-                    current_nvda_price = float(
-                        price_data["Close"]["NVDA"].loc[previous_dates[-1]]
-                    )
-                    current_djt_price = float(
-                        price_data["Close"]["DJT"].loc[previous_dates[-1]]
-                    )
-
-                    sp500_price = 100000 * (current_sp500_price / initial_sp500_price)
-                    tqqq_price = 100000 * (current_tqqq_price / initial_tqqq_price)
-                    nvda_price = 100000 * (current_nvda_price / initial_nvda_price)
-                    djt_price = 100000 * (current_djt_price / initial_djt_price)
-                else:
-                    sp500_price = tqqq_price = nvda_price = djt_price = None
-
-            sp500_prices.append(sp500_price)
-            tqqq_prices.append(tqqq_price)
-            nvda_prices.append(nvda_price)
-            djt_prices.append(djt_price)
-
-            # Process leaderboard data
-            with open(file, "r") as f:
-                dict_leaderboard = json.load(f)
-            # ...existing DataFrame processing code...
-            df = pl.DataFrame(
-                [
-                    {
-                        "Account Name": k,
-                        "Money In Account": v[0],
-                        "Investopedia Link": v[1],
-                        "Stocks Invested In": v[2] if len(v) > 2 else [],
-                    }
-                    for k, v in dict_leaderboard.items()
-                ]
-            )
-            df = df.sort("Money In Account", descending=True)
-            if len(df.columns) == 3:
-                df = df.with_columns(
-                    pl.Series(
-                        name="Stocks Invested In", values=[0 for i in range(len(df))]
-                    )
-                )
-            df = df.with_columns(
-                pl.Series(name="Ranking", values=range(1, len(df) + 1))
-            )
-            all_dfs.append(df)
-
-        # Get latest df for stock information
-        latest_df = all_dfs[-1]
-
-        # Process each user using the pre-processed data
-        for player_name in usernames:
+    players = latest_df.get_column("Account Name").to_list()
+    with tqdm(total=len(players), desc="Processing players") as pbar:
+        for player_name in players:
             player_money = []
             rankings = []
-
-            # Check if player exists in latest data
-            if player_name not in latest_df.get_column("Account Name").to_list():
-                continue
 
             # Extract data for this player from all timepoints
             for df in all_dfs:
@@ -661,86 +692,213 @@ def make_user_pages(usernames):
                 for stock in player_stocks_data
             ]
 
-            # Render template
-            rendered = render_template(
-                "player.html",
-                labels=labels,
-                player_money=player_money,
-                player_name=player_name,
-                investopedia_link=investopedia_link,
-                player_stocks=player_stocks,
-                update_time=datetime.utcnow()
-                .astimezone(ZoneInfo("US/Pacific"))
-                .strftime("%H:%M:%S %m-%d-%Y"),
-                sp500_prices=sp500_prices,
-                tqqq_prices=tqqq_prices,
-                nvda_prices=nvda_prices,
-                djt_prices=djt_prices,
-                zip=zip,
-            )
+            player_data[player_name] = {
+                "money": player_money,
+                "rankings": rankings,
+                "investopedia_link": investopedia_link,
+                "stocks": player_stocks,
+            }
+            pbar.update(1)
 
-            with open(f"players/{player_name}.html", "w") as f:
-                f.write(rendered)
+    return player_data
 
-        # Prepare arguments for parallel processing
-        latest_df = all_dfs[-1]
+
+def process_single_user(args):
+    """Modified to use pre-processed player data"""
+    (
+        player_name,
+        labels,
+        player_data,
+        sp500_prices,
+        tqqq_prices,
+        nvda_prices,
+        djt_prices,
+    ) = args
+
+    if player_name not in player_data:
+        return None
+
+    player_info = player_data[player_name]
+
+    with app.app_context():
+        rendered = render_template(
+            "player.html",
+            labels=labels,
+            player_money=player_info["money"],
+            player_name=player_name,
+            investopedia_link=player_info["investopedia_link"],
+            player_stocks=player_info["stocks"],
+            update_time=datetime.utcnow()
+            .astimezone(ZoneInfo("US/Pacific"))
+            .strftime("%H:%M:%S %m-%d-%Y"),
+            sp500_prices=sp500_prices,
+            tqqq_prices=tqqq_prices,
+            nvda_prices=nvda_prices,
+            djt_prices=djt_prices,
+            zip=zip,
+        )
+
+    return player_name, rendered
+
+
+def make_user_pages(usernames):
+    """Modified to use centralized player data processing"""
+    with app.app_context():
+        # Get analyzed data
+        data = analyze_leaderboard_data()
+        all_dfs = data["all_dfs"]
+        timestamps = data["timestamps"]
+        latest_df = data["latest_df"]
+
+        if not timestamps:
+            print("No data available")
+            return
+
+        # Process all player data once
+        player_data = process_all_player_data(all_dfs, latest_df)
+
+        # Price data processing remains the same
+        print("Fetching price data...")
+        start_date = min(timestamps).date()
+        end_date = max(timestamps).date() + timedelta(days=1)
+        initial_date = datetime(2024, 8, 20, tzinfo=ZoneInfo("America/New_York"))
+        initial_date = get_previous_trading_day(initial_date)
+
+        # Get initial prices
+        initial_prices = yf.download(
+            ["SPY", "TQQQ", "NVDA", "DJT"],
+            start=initial_date,
+            end=initial_date + timedelta(days=1),
+            interval="1h",
+        )
+        initial_sp500_price = float(initial_prices["Close"]["SPY"].iloc[0])
+        initial_tqqq_price = float(initial_prices["Close"]["TQQQ"].iloc[0])
+        initial_nvda_price = float(initial_prices["Close"]["NVDA"].iloc[0])
+        initial_djt_price = float(initial_prices["Close"]["DJT"].iloc[0])
+
+        # Get price data for date range
+        price_data = fetch_price_data(
+            start_date, end_date, ["SPY", "TQQQ", "NVDA", "DJT"]
+        )
+
+        # Initialize price lists
+        labels = []
+        sp500_prices = []
+        tqqq_prices = []
+        nvda_prices = []
+        djt_prices = []
+
+        print("Processing timestamps...")
+        with tqdm(total=len(timestamps), desc="Processing timestamps") as pbar:
+            for timestamp in timestamps:
+                date_time_str = timestamp.strftime("%Y-%m-%dT%H:%M:%S")
+                labels.append(date_time_str)
+
+                # Calculate relative prices
+                try:
+                    current_sp500_price = float(
+                        price_data["Close"]["SPY"].loc[timestamp]
+                    )
+                    current_tqqq_price = float(
+                        price_data["Close"]["TQQQ"].loc[timestamp]
+                    )
+                    current_nvda_price = float(
+                        price_data["Close"]["NVDA"].loc[timestamp]
+                    )
+                    current_djt_price = float(price_data["Close"]["DJT"].loc[timestamp])
+
+                    sp500_prices.append(
+                        100000 * (current_sp500_price / initial_sp500_price)
+                    )
+                    tqqq_prices.append(
+                        100000 * (current_tqqq_price / initial_tqqq_price)
+                    )
+                    nvda_prices.append(
+                        100000 * (current_nvda_price / initial_nvda_price)
+                    )
+                    djt_prices.append(100000 * (current_djt_price / initial_djt_price))
+                except (KeyError, IndexError):
+                    sp500_prices.append(None)
+                    tqqq_prices.append(None)
+                    nvda_prices.append(None)
+                    djt_prices.append(None)
+
+                pbar.update(1)
+
+        latest_df = all_dfs[-1] if all_dfs else None
+        if latest_df is None or latest_df.is_empty():  # Proper way to check DataFrame
+            print("No data available in latest DataFrame")
+            return
+
+        # Process users with progress bar
+        print("Processing parallel user pages...")
         process_args = [
             (
                 name,
                 labels,
-                all_dfs,
+                player_data,
                 sp500_prices,
                 tqqq_prices,
                 nvda_prices,
                 djt_prices,
-                latest_df,
             )
             for name in usernames
         ]
 
-        # Process users in parallel using spawn context
-        num_processes = min(
-            cpu_count(), len(usernames)
-        )  # Don't create more processes than users
+        num_processes = min(cpu_count(), len(usernames))
         with MULTIPROCESSING_CONTEXT.Pool(processes=num_processes) as pool:
-            results = pool.map(process_single_user, process_args)
+            results = list(
+                tqdm(
+                    pool.imap(process_single_user, process_args),
+                    total=len(usernames),
+                    desc="Parallel processing",
+                )
+            )
 
-        # Write results to files
-        for result in results:
-            if result is not None:
-                player_name, rendered = result
-                with open(f"players/{player_name}.html", "w") as f:
-                    f.write(rendered)
+        print("Writing results to files...")
+        with tqdm(total=len(results), desc="Writing files") as pbar:
+            for result in results:
+                if result is not None:
+                    player_name, rendered = result
+                    with open(f"players/{player_name}.html", "w") as f:
+                        f.write(rendered)
+                pbar.update(1)
 
 
 def make_combined_chart():
     """Generate a page showing all players' performance on one chart"""
     with app.app_context():
+        # Get analyzed data
+        data = analyze_leaderboard_data()
+        leaderboard_files = data["leaderboard_files"]
+
+        # Continue with chart generation
+        print("Loading leaderboard files...")
         leaderboard_files = sorted(glob("./backend/leaderboards/in_time/*"))
         labels = []
         all_data = {}
 
-        # Process each leaderboard file
-        for file in leaderboard_files:
-            file_name = os.path.basename(file)
-            date_time_str = file_name[len("leaderboard-") : -len(".json")]
-            date_time = datetime.strptime(
-                date_time_str.replace("_", ":"), "%Y-%m-%d-%H:%M"
-            )
-            labels.append(date_time.strftime("%Y-%m-%dT%H:%M:%S"))
+        print("Processing leaderboard data...")
+        with tqdm(total=len(leaderboard_files), desc="Processing leaderboards") as pbar:
+            for file in leaderboard_files:
+                file_name = os.path.basename(file)
+                date_time_str = file_name[len("leaderboard-") : -len(".json")]
+                date_time = datetime.strptime(
+                    date_time_str.replace("_", ":"), "%Y-%m-%d-%H:%M"
+                )
+                labels.append(date_time.strftime("%Y-%m-%dT%H:%M:%S"))
 
-            # Load and process the leaderboard data
-            with open(file, "r") as f:
-                dict_leaderboard = json.load(f)
+                with open(file, "r") as f:
+                    dict_leaderboard = json.load(f)
 
-            for player, data in dict_leaderboard.items():
-                if player not in all_data:
-                    all_data[player] = []
-                # Fix: data is a list where the first element is the account value
-                money = float(str(data[0]).replace("$", "").replace(",", ""))
-                all_data[player].append(money)
+                for player, data in dict_leaderboard.items():
+                    if player not in all_data:
+                        all_data[player] = []
+                    money = float(str(data[0]).replace("$", "").replace(",", ""))
+                    all_data[player].append(money)
+                pbar.update(1)
 
-        # Create datasets for Chart.js
+        print("Creating datasets...")
         colors = [
             "#FF6384",
             "#36A2EB",
@@ -760,31 +918,49 @@ def make_combined_chart():
         ]
 
         datasets = []
-        for idx, (player, values) in enumerate(all_data.items()):
-            color = colors[idx % len(colors)]
-            datasets.append(
-                {
-                    "label": player,
-                    "data": values,
-                    "borderColor": color,
-                    "backgroundColor": color,
-                    "fill": False,
-                    "tension": 0.1,
-                }
-            )
+        with tqdm(total=len(all_data), desc="Creating datasets") as pbar:
+            for idx, (player, values) in enumerate(all_data.items()):
+                color = colors[idx % len(colors)]
+                datasets.append(
+                    {
+                        "label": player,
+                        "data": values,
+                        "borderColor": color,
+                        "backgroundColor": color,
+                        "fill": False,
+                        "tension": 0.1,
+                    }
+                )
+                pbar.update(1)
 
-        # Render template
-        rendered = render_template(
-            "cometogether.html", labels=labels, datasets=datasets
-        )
-        return rendered
+        return render_parallel("cometogether.html", labels=labels, datasets=datasets)
 
 
 def make_about_page():
     """Generate the about page HTML"""
-    with app.app_context():
-        rendered = render_template("about.html")
-        return rendered
+    return render_parallel("about.html")
+
+
+def make_pages_parallel():
+    """Generate all pages in parallel"""
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        # Start all page generations
+        index_future = executor.submit(make_index_page)
+        about_future = executor.submit(make_about_page)
+        chart_future = executor.submit(make_combined_chart)
+
+        # Get results
+        index_content = index_future.result()
+        about_content = about_future.result()
+        chart_content = chart_future.result()
+
+        # Write results
+        with open("index.html", "w") as f:
+            f.write(index_content)
+        with open("about.html", "w") as f:
+            f.write(about_content)
+        with open("cometogether.html", "w") as f:
+            f.write(chart_content)
 
 
 if __name__ == "__main__":
