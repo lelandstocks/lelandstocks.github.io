@@ -1,6 +1,5 @@
 import json
 import os
-from collections import Counter
 from datetime import datetime, timedelta
 from glob import glob
 from multiprocessing import cpu_count, get_context
@@ -266,13 +265,46 @@ def make_index_page():
         )
         df = df.sort("Money In Account", descending=True)
         df = df.with_columns(pl.Series(name="Ranking", values=range(1, len(df) + 1)))
-        all_stocks = []
+        stock_values = {}  # Track value and performance for each stock
+        total_investment = 0
+
         for stocks in df.get_column("Stocks Invested In"):
-            if len(stocks) > 0:
-                all_stocks.extend([x[0] for x in stocks])
-        stock_cnt = Counter(
-            all_stocks
-        ).most_common()  # In order to determine the most common stocks. Now stock_cnt is a list of tuples
+            if isinstance(stocks, str):
+                continue
+            for stock in stocks:
+                symbol = stock[0]
+                current_price = float(stock[1].replace("$", "").replace(",", ""))
+                pct_change = float(stock[2].replace("%", "")) / 100
+
+                # Calculate initial price based on percent change
+                initial_price = (
+                    current_price
+                    if pct_change == -1
+                    else current_price / (1 + pct_change)
+                )
+
+                if symbol not in stock_values:
+                    stock_values[symbol] = {"count": 0, "current": 0, "initial": 0}
+
+                stock_values[symbol]["count"] += 1
+                stock_values[symbol]["current"] += current_price
+                stock_values[symbol]["initial"] += initial_price
+                total_investment += current_price
+
+        # Convert to format expected by template
+        stock_cnt = [
+            (
+                symbol,
+                data["count"],
+                data["current"],
+                data["initial"],
+                ((data["current"] / data["initial"]) - 1) * 100
+                if data["initial"] > 0
+                else 0,
+            )
+            for symbol, data in stock_values.items()
+        ]
+        stock_cnt.sort(key=lambda x: x[1], reverse=True)  # Sort by count
         df = df.with_columns(
             pl.col("Stocks Invested In").map_elements(
                 lambda x: ", ".join([stock[0] for stock in x]), return_dtype=pl.Utf8
