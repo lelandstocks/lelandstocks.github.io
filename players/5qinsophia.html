@@ -51,15 +51,19 @@
     </head>
 
     <body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-        <nav class="bg-white dark:bg-gray-800 shadow-md">
+        <nav class="bg-white dark:bg-gray-800 shadow-md relative">
             <div class="container mx-auto px-4">
                 <div class="flex items-center justify-between h-16">
                     <!-- Mobile Menu Button -->
-                    <button class="md:hidden p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" onclick="toggleMobileMenu()">
-                        <div class="w-6 h-6 flex flex-col justify-around">
-                            <span class="block w-full h-0.5 bg-current transition-all"></span>
-                            <span class="block w-full h-0.5 bg-current transition-all"></span>
-                            <span class="block w-full h-0.5 bg-current transition-all"></span>
+                    <button 
+                        class="md:hidden p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                        onclick="toggleMobileMenu()"
+                        aria-label="Menu"
+                    >
+                        <div class="w-6 h-6 flex flex-col justify-around" id="hamburger">
+                            <span class="block w-full h-0.5 bg-current transform transition-all duration-200"></span>
+                            <span class="block w-full h-0.5 bg-current transform transition-all duration-200"></span>
+                            <span class="block w-full h-0.5 bg-current transform transition-all duration-200"></span>
                         </div>
                     </button>
 
@@ -80,8 +84,8 @@
                 </div>
 
                 <!-- Mobile Navigation -->
-                <div id="mobileNav" class="hidden md:hidden">
-                    <div class="px-2 pt-2 pb-3 space-y-1">
+                <div id="mobileNav" class="md:hidden absolute left-0 right-0 bg-white dark:bg-gray-800 z-50 transform transition-transform duration-200 -translate-y-full">
+                    <div class="px-2 pt-2 pb-3 space-y-1 shadow-lg">
                         <a href="/" class="mobile-nav-link">Home</a>
                         <a href="/about.html" class="mobile-nav-link">About</a>
                         <a href="/players/teachermiller.html" class="mobile-nav-link">Teacher Miller</a>
@@ -108,7 +112,7 @@
             </div>
             <div class="text-left sm:text-right">
                 <p class="text-white/80 text-sm">Last Updated</p>
-                <p class="text-base sm:text-lg">17:06:18 12-05-2024</p>
+                <p class="text-base sm:text-lg">17:09:26 12-05-2024</p>
             </div>
         </div>
     </div>
@@ -695,7 +699,7 @@
             }
             
             .mobile-nav-link {
-                @apply block px-3 py-2 text-base font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-all duration-200;
+                @apply block w-full px-4 py-2 text-base font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-all duration-200;
             }
             
             .mobile-nav-link-special {
@@ -731,13 +735,85 @@
             td, th {
                 font-variant-numeric: tabular-nums;
             }
+
+            /* Mobile menu animations */
+            #mobileNav {
+                transform: translateY(-100%);
+                opacity: 0;
+                visibility: hidden;
+                transition: all 0.3s ease-in-out;
+            }
+
+            #mobileNav.active {
+                transform: translateY(0);
+                opacity: 1;
+                visibility: visible;
+            }
+
+            /* Hamburger animation */
+            #hamburger span {
+                transform-origin: center;
+            }
+
+            #hamburger.active span:first-child {
+                transform: translateY(8px) rotate(45deg);
+            }
+
+            #hamburger.active span:nth-child(2) {
+                opacity: 0;
+            }
+
+            #hamburger.active span:last-child {
+                transform: translateY(-8px) rotate(-45deg);
+            }
+
+            /* Mobile nav link styles */
+            .mobile-nav-link {
+                @apply block w-full px-4 py-2 text-base font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-all duration-200;
+            }
+
+            /* Prevent scrolling when menu is open */
+            body.menu-open {
+                overflow: hidden;
+            }
         </style>
 
         <script>
             function toggleMobileMenu() {
                 const mobileNav = document.getElementById('mobileNav');
-                mobileNav.classList.toggle('hidden');
+                const hamburger = document.getElementById('hamburger');
+                const body = document.body;
+                
+                mobileNav.classList.toggle('active');
+                hamburger.classList.toggle('active');
+                body.classList.toggle('menu-open');
             }
+
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', (e) => {
+                const mobileNav = document.getElementById('mobileNav');
+                const hamburger = document.getElementById('hamburger');
+                
+                if (mobileNav.classList.contains('active') && 
+                    !e.target.closest('#mobileNav') && 
+                    !e.target.closest('#hamburger')) {
+                    mobileNav.classList.remove('active');
+                    hamburger.classList.remove('active');
+                    document.body.classList.remove('menu-open');
+                }
+            });
+
+            // Close mobile menu on resize if screen becomes larger
+            window.addEventListener('resize', () => {
+                if (window.innerWidth >= 768) {
+                    const mobileNav = document.getElementById('mobileNav');
+                    const hamburger = document.getElementById('hamburger');
+                    
+                    mobileNav.classList.remove('active');
+                    hamburger.classList.remove('active');
+                    document.body.classList.remove('menu-open');
+                }
+            });
         </script>
     </body>
 
