@@ -71,7 +71,10 @@
                             {% for stock in player_stocks %}
                             <tr class="hover:bg-secondary transition-colors">
                                 <td class="px-4 py-2 whitespace-nowrap font-medium">
-                                    <button class="stock-button hover:underline" data-stock="{{ stock[0] }}">{{ stock[0] }}</button>
+                                    <button type="button" 
+                                            onclick="window.open('https://finance.yahoo.com/quote/{{ stock[0] }}', '_blank')"
+                                            class="stock-button hover:underline focus:outline-none" 
+                                            data-stock="{{ stock[0] }}">{{ stock[0] }}</button>
                                 </td>
                                 <td class="px-4 py-2 whitespace-nowrap text-right text-label">${{ '{:,.0f}'.format(stock[1]) }}</td>
                                 <td class="px-4 py-2 whitespace-nowrap text-right {% if stock[2] >= 0 %}text-success{% else %}text-danger{% endif %}">

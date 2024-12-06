@@ -552,7 +552,10 @@
                             {% for stock, count, current, initial, pct in stock_cnt %}
                             <tr>
                                 <td>
-                                    <button class="stock-button hover:underline" data-stock="{{ stock }}">{{ stock }}</button>
+                                    <button type="button" 
+                                            onclick="window.open('https://finance.yahoo.com/quote/{{ stock }}', '_blank')"
+                                            class="stock-button hover:underline focus:outline-none" 
+                                            data-stock="{{ stock }}">{{ stock }}</button>
                                 </td>
                                 <td>{{ count }}</td>
                                 <td>${{ '{:,.2f}'.format(current) }}</td>
