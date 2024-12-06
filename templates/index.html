@@ -251,6 +251,62 @@
         .hidden.md\:table-cell {
             display: none !important;
         }
+
+        .mobile-row {
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .mobile-row-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            cursor: pointer;
+        }
+
+        .mobile-row-content {
+            display: none;
+            padding: 0.75rem;
+            background-color: #f9fafb;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .mobile-row-content.active {
+            display: block;
+        }
+
+        .mobile-row:last-child {
+            border-bottom: none;
+        }
+
+        .mobile-value {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .collapsible-content {
+            display: none;
+        }
+
+        .collapsible-content.active {
+            display: block;
+        }
+
+        /* Dark mode adjustments */
+        @media (prefers-color-scheme: dark) {
+            .mobile-row {
+                border-bottom-color: #374151;
+            }
+
+            .mobile-row-content {
+                background-color: #1f2937;
+                border-top-color: #374151;
+            }
+
+            .mobile-value {
+                color: #9ca3af;
+            }
+        }
     }
 
     /* Dark mode improvements */
@@ -494,25 +550,22 @@
                     {% for row in row_data %}
                     <tr class="border-b {% if 'teachermiller' in row %}font-bold{% endif %}">
                         <!-- Mobile view -->
-                        <td class="md:hidden">
-                            <div class="flex items-center justify-between p-4">
+                        <td class="md:hidden mobile-row">
+                            <div class="mobile-row-header" onclick="toggleMobileRow(this)">
                                 <div class="flex items-center space-x-4">
-                                    <span class="text-sm">{{ row[0] }}</span>
+                                    <span class="text-sm font-medium">#{{ row[0] }}</span>
                                     <span>{{ row[1] | safe }}</span>
                                 </div>
-                                <button class="collapsible-header bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 px-3 py-1 rounded-md text-sm">
-                                    <span class="toggle-icon flex items-center">
-                                        Details
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                        </svg>
-                                    </span>
-                                </button>
+                                <svg class="w-5 h-5 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                </svg>
                             </div>
-                            <div class="collapsible-content px-4 py-2 bg-gray-50 dark:bg-gray-900"></div>
-                                <p class="py-1"><span class="font-semibold">Account Value:</span> {{ row[2] }}</p>
-                                <p class="py-1"><span class="font-semibold">Stocks Invested:</span> {{ row[3] }}</p>
-                                <p class="py-1"><span class="font-semibold">Z-Score:</span> {{ row[4] }}</p>
+                            <div class="mobile-row-content">
+                                <div class="space-y-2">
+                                    <p><span class="font-medium">Account Value:</span> <span class="mobile-value">{{ row[2] }}</span></p>
+                                    <p><span class="font-medium">Stocks Invested:</span> <span class="mobile-value">{{ row[3] }}</span></p>
+                                    <p><span class="font-medium">Z-Score:</span> <span class="mobile-value">{{ row[4] }}</span></p>
+                                </div>
                             </div>
                         </td>
                         <!-- Desktop view -->
@@ -1093,5 +1146,29 @@
         });
     });
 
+    function toggleMobileRow(element) {
+        const content = element.parentElement.querySelector('.mobile-row-content');
+        const arrow = element.querySelector('svg');
+        
+        // Close all other open rows
+        document.querySelectorAll('.mobile-row-content.active').forEach(item => {
+            if (item !== content) {
+                item.classList.remove('active');
+                item.previousElementSibling.querySelector('svg').classList.remove('rotate-180');
+            }
+        });
+        
+        // Toggle current row
+        content.classList.toggle('active');
+        arrow.classList.toggle('rotate-180');
+    }
+
+    // Initialize mobile view on load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Hide all mobile row content initially
+        document.querySelectorAll('.mobile-row-content').forEach(content => {
+            content.classList.remove('active');
+        });
+    });
 </script>
 {% endblock %}

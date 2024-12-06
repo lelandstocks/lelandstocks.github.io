@@ -4,6 +4,10 @@
     <head>
         <title>5nguyenethan's Portfolio</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- Add JetBrains Mono font -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
         <link rel="stylesheet"
             href="https://unpkg.com/franken-ui@1.1.0/dist/css/core.min.css" />
         <script src="https://unpkg.com/franken-ui@1.1.0/dist/js/core.iife.js"
@@ -104,7 +108,7 @@
             </div>
             <div class="text-left sm:text-right">
                 <p class="text-white/80 text-sm">Last Updated</p>
-                <p class="text-base sm:text-lg">17:02:50 12-05-2024</p>
+                <p class="text-base sm:text-lg">17:06:16 12-05-2024</p>
             </div>
         </div>
     </div>
@@ -683,6 +687,25 @@
             *:focus {
                 outline: none;
                 box-shadow: 0 0 0 3px rgba(99,102,241,0.3);
+            }
+
+            /* Apply JetBrains Mono to everything */
+            :root {
+                --font-mono: 'JetBrains Mono', monospace;
+            }
+            
+            * {
+                font-family: var(--font-mono);
+            }
+            
+            /* Adjust number spacing */
+            .font-mono {
+                font-variant-numeric: tabular-nums;
+            }
+            
+            /* Ensure numbers are monospaced in tables */
+            td, th {
+                font-variant-numeric: tabular-nums;
             }
         </style>
 
