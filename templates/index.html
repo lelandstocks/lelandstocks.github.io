@@ -19,14 +19,18 @@
         color: white;
         margin-bottom: var(--section-spacing);
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        position: sticky;
+        top: 0;
+        z-index: 10;
     }
 
     /* Container improvements */
     .container {
         max-width: 1440px;
-        padding-left: var(--container-padding);
-        padding-right: var(--container-padding);
+        padding-left: max(var(--container-padding), env(safe-area-inset-left));
+        padding-right: max(var(--container-padding), env(safe-area-inset-right));
         margin: 0 auto;
+        width: 100%;
     }
 
     /* Card improvements */
@@ -50,7 +54,7 @@
         box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         padding: var(--card-padding);
         margin-bottom: var(--section-spacing);
-        height: 500px;  /* Fixed height instead of min-height */
+        height: min(500px, 70vh);  /* Responsive height */
         display: flex;
         flex-direction: column;
     }
@@ -164,6 +168,89 @@
             padding: 0.35rem 0.5rem;
             font-size: 0.875rem;
         }
+
+        /* Adjust card padding */
+        :root {
+            --card-padding: 0.75rem;
+            --container-padding: 0.75rem;
+            --section-spacing: 1rem;
+        }
+
+        /* Improve mobile table layout */
+        .md\:hidden td {
+            padding: 0.75rem;
+        }
+
+        /* Make mobile details button more prominent */
+        .collapsible-header {
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        /* Improve collapsible content spacing */
+        .collapsible-content {
+            margin-top: 0.5rem;
+            border-radius: 0.375rem;
+            padding: 0.75rem;
+        }
+
+        /* Improve stats cards on mobile */
+        .stats-card {
+            padding: var(--card-padding);
+        }
+
+        /* Better button spacing on mobile */
+        .text-center.mt-4.space-x-2 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            padding: 0.5rem;
+        }
+
+        .uk-button {
+            padding: 0.375rem 0.5rem;
+            font-size: 0.875rem;
+            white-space: nowrap;
+        }
+
+        /* Improve legend layout on mobile */
+        .legend {
+            gap: 0.5rem;
+            padding: 0.25rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .legend-item {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        /* Improve mobile search */
+        #accountSearch {
+            padding: 0.75rem;
+            font-size: 0.875rem;
+        }
+
+        .uk-table-responsive td {
+            padding: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .uk-table-responsive th {
+            display: none;
+        }
+
+        /* Fix mobile view content */
+        .md\:hidden {
+            display: block !important;
+        }
+
+        .hidden.md\:table-cell {
+            display: none !important;
+        }
     }
 
     /* Dark mode improvements */
@@ -196,6 +283,37 @@
         .legend-item:hover {
             background-color: #4b5563;
         }
+
+        .collapsible-header {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .collapsible-content {
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+    }
+
+    /* Extra small device improvements */
+    @media (max-width: 360px) {
+        :root {
+            --card-padding: 0.5rem;
+            --container-padding: 0.5rem;
+        }
+
+        .legend-item {
+            padding: 0.25rem;
+            font-size: 0.7rem;
+        }
+
+        .uk-button {
+            padding: 0.25rem 0.375rem;
+            font-size: 0.75rem;
+        }
+    }
+
+    /* Improve table responsiveness */
+    .uk-table-responsive {
+        margin-bottom: 0;
     }
 </style>
 {% endblock %}
@@ -249,9 +367,9 @@
                 <div class="chart-container" id="chart-container">
                     <div id="stockChart" class="w-full h-full"></div>
                 </div>
-                <div class="text-center mt-4 space-x-2">
-                    <button class="uk-button uk-button-default" id="toggleTrendlines">Show Trends</button>
-                    <button class="uk-button uk-button-default" id="resetZoom">Reset Zoom</button>
+                <div class="text-center mt-4 grid grid-cols-3 sm:grid-cols-6 gap-2 px-2">
+                    <button class="uk-button uk-button-default col-span-3 sm:col-span-1" id="toggleTrendlines">Show Trends</button>
+                    <button class="uk-button uk-button-default col-span-3 sm:col-span-1" id="resetZoom">Reset Zoom</button>
                     <button class="uk-button uk-button-default time-range" data-days="1">1D</button>
                     <button class="uk-button uk-button-default time-range" data-days="7">1W</button>
                     <button class="uk-button uk-button-default time-range" data-days="30">1M</button>
@@ -391,7 +509,7 @@
                                     </span>
                                 </button>
                             </div>
-                            <div class="collapsible-content px-4 py-2 bg-gray-50 dark:bg-gray-900">
+                            <div class="collapsible-content px-4 py-2 bg-gray-50 dark:bg-gray-900"></div>
                                 <p class="py-1"><span class="font-semibold">Account Value:</span> {{ row[2] }}</p>
                                 <p class="py-1"><span class="font-semibold">Stocks Invested:</span> {{ row[3] }}</p>
                                 <p class="py-1"><span class="font-semibold">Z-Score:</span> {{ row[4] }}</p>
