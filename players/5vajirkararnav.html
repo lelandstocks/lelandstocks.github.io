@@ -112,7 +112,7 @@
             </div>
             <div class="text-left sm:text-right">
                 <p class="text-white/80 text-sm">Last Updated</p>
-                <p class="text-base sm:text-lg">18:00:42 12-05-2024</p>
+                <p class="text-base sm:text-lg">18:04:50 12-05-2024</p>
             </div>
         </div>
     </div>
@@ -617,6 +617,16 @@
                     visible: isVisible && trendlinesVisible
                 });
             }
+        });
+    });
+
+    // Add stock button click handler
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.stock-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const stock = this.dataset.stock;
+                window.open(`https://finance.yahoo.com/quote/${stock}`, '_blank');
+            });
         });
     });
 

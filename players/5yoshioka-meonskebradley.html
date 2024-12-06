@@ -112,7 +112,7 @@
             </div>
             <div class="text-left sm:text-right">
                 <p class="text-white/80 text-sm">Last Updated</p>
-                <p class="text-base sm:text-lg">18:00:38 12-05-2024</p>
+                <p class="text-base sm:text-lg">18:04:46 12-05-2024</p>
             </div>
         </div>
     </div>
@@ -160,7 +160,9 @@
                         <tbody class="bg-card divide-y divide-border">
                             
                             <tr class="hover:bg-secondary transition-colors">
-                                <td class="px-4 py-2 whitespace-nowrap font-medium text-label">AAPL</td>
+                                <td class="px-4 py-2 whitespace-nowrap font-medium">
+                                    <button class="stock-button hover:underline" data-stock="AAPL">AAPL</button>
+                                </td>
                                 <td class="px-4 py-2 whitespace-nowrap text-right text-label">$6,071</td>
                                 <td class="px-4 py-2 whitespace-nowrap text-right text-success">
                                     +7.8%
@@ -168,7 +170,9 @@
                             </tr>
                             
                             <tr class="hover:bg-secondary transition-colors">
-                                <td class="px-4 py-2 whitespace-nowrap font-medium text-label">ASML</td>
+                                <td class="px-4 py-2 whitespace-nowrap font-medium">
+                                    <button class="stock-button hover:underline" data-stock="ASML">ASML</button>
+                                </td>
                                 <td class="px-4 py-2 whitespace-nowrap text-right text-label">$14,216</td>
                                 <td class="px-4 py-2 whitespace-nowrap text-right text-success">
                                     +5.1%
@@ -176,7 +180,9 @@
                             </tr>
                             
                             <tr class="hover:bg-secondary transition-colors">
-                                <td class="px-4 py-2 whitespace-nowrap font-medium text-label">CRWD</td>
+                                <td class="px-4 py-2 whitespace-nowrap font-medium">
+                                    <button class="stock-button hover:underline" data-stock="CRWD">CRWD</button>
+                                </td>
                                 <td class="px-4 py-2 whitespace-nowrap text-right text-label">$51,265</td>
                                 <td class="px-4 py-2 whitespace-nowrap text-right text-success">
                                     +20.3%
@@ -184,7 +190,9 @@
                             </tr>
                             
                             <tr class="hover:bg-secondary transition-colors">
-                                <td class="px-4 py-2 whitespace-nowrap font-medium text-label">CSCO</td>
+                                <td class="px-4 py-2 whitespace-nowrap font-medium">
+                                    <button class="stock-button hover:underline" data-stock="CSCO">CSCO</button>
+                                </td>
                                 <td class="px-4 py-2 whitespace-nowrap text-right text-label">$10,697</td>
                                 <td class="px-4 py-2 whitespace-nowrap text-right text-success">
                                     +9.4%
@@ -192,7 +200,9 @@
                             </tr>
                             
                             <tr class="hover:bg-secondary transition-colors">
-                                <td class="px-4 py-2 whitespace-nowrap font-medium text-label">DIS</td>
+                                <td class="px-4 py-2 whitespace-nowrap font-medium">
+                                    <button class="stock-button hover:underline" data-stock="DIS">DIS</button>
+                                </td>
                                 <td class="px-4 py-2 whitespace-nowrap text-right text-label">$117</td>
                                 <td class="px-4 py-2 whitespace-nowrap text-right text-success">
                                     +35.7%
@@ -200,7 +210,9 @@
                             </tr>
                             
                             <tr class="hover:bg-secondary transition-colors">
-                                <td class="px-4 py-2 whitespace-nowrap font-medium text-label">MCD</td>
+                                <td class="px-4 py-2 whitespace-nowrap font-medium">
+                                    <button class="stock-button hover:underline" data-stock="MCD">MCD</button>
+                                </td>
                                 <td class="px-4 py-2 whitespace-nowrap text-right text-label">$1,196</td>
                                 <td class="px-4 py-2 whitespace-nowrap text-right text-success">
                                     +10.4%
@@ -208,7 +220,9 @@
                             </tr>
                             
                             <tr class="hover:bg-secondary transition-colors">
-                                <td class="px-4 py-2 whitespace-nowrap font-medium text-label">MSFT</td>
+                                <td class="px-4 py-2 whitespace-nowrap font-medium">
+                                    <button class="stock-button hover:underline" data-stock="MSFT">MSFT</button>
+                                </td>
                                 <td class="px-4 py-2 whitespace-nowrap text-right text-label">$8,861</td>
                                 <td class="px-4 py-2 whitespace-nowrap text-right text-success">
                                     +6.5%
@@ -216,7 +230,9 @@
                             </tr>
                             
                             <tr class="hover:bg-secondary transition-colors">
-                                <td class="px-4 py-2 whitespace-nowrap font-medium text-label">RSPA</td>
+                                <td class="px-4 py-2 whitespace-nowrap font-medium">
+                                    <button class="stock-button hover:underline" data-stock="RSPA">RSPA</button>
+                                </td>
                                 <td class="px-4 py-2 whitespace-nowrap text-right text-label">$9,057</td>
                                 <td class="px-4 py-2 whitespace-nowrap text-right text-success">
                                     +3.0%
@@ -224,7 +240,9 @@
                             </tr>
                             
                             <tr class="hover:bg-secondary transition-colors">
-                                <td class="px-4 py-2 whitespace-nowrap font-medium text-label">VOOG</td>
+                                <td class="px-4 py-2 whitespace-nowrap font-medium">
+                                    <button class="stock-button hover:underline" data-stock="VOOG">VOOG</button>
+                                </td>
                                 <td class="px-4 py-2 whitespace-nowrap text-right text-label">$13,055</td>
                                 <td class="px-4 py-2 whitespace-nowrap text-right text-success">
                                     +10.7%
@@ -689,6 +707,16 @@
                     visible: isVisible && trendlinesVisible
                 });
             }
+        });
+    });
+
+    // Add stock button click handler
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.stock-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const stock = this.dataset.stock;
+                window.open(`https://finance.yahoo.com/quote/${stock}`, '_blank');
+            });
         });
     });
 

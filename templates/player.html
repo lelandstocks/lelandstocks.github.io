@@ -70,7 +70,9 @@
                         <tbody class="bg-card divide-y divide-border">
                             {% for stock in player_stocks %}
                             <tr class="hover:bg-secondary transition-colors">
-                                <td class="px-4 py-2 whitespace-nowrap font-medium text-label">{{ stock[0] }}</td>
+                                <td class="px-4 py-2 whitespace-nowrap font-medium">
+                                    <button class="stock-button hover:underline" data-stock="{{ stock[0] }}">{{ stock[0] }}</button>
+                                </td>
                                 <td class="px-4 py-2 whitespace-nowrap text-right text-label">${{ '{:,.0f}'.format(stock[1]) }}</td>
                                 <td class="px-4 py-2 whitespace-nowrap text-right {% if stock[2] >= 0 %}text-success{% else %}text-danger{% endif %}">
                                     {{ '{:+.1f}%'.format(stock[2]) }}
@@ -515,6 +517,16 @@
                     visible: isVisible && trendlinesVisible
                 });
             }
+        });
+    });
+
+    // Add stock button click handler
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.stock-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const stock = this.dataset.stock;
+                window.open(`https://finance.yahoo.com/quote/${stock}`, '_blank');
+            });
         });
     });
 
@@ -1016,5 +1028,21 @@ td, th {
         min-height: 500px;
     }
 }
+
+/* Add stock button styles */
+.stock-button {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.stock-button:hover {
+    color: var(--button-active-text);
+}
+
 </style>
 {% endblock %}

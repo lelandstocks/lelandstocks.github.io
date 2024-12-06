@@ -390,6 +390,28 @@
     .uk-table-responsive {
         margin-bottom: 0;
     }
+
+    /* Add stock button styles */
+    .stock-button {
+        background: none;
+        border: none;
+        padding: 0;
+        font: inherit;
+        color: inherit;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .stock-button:hover {
+        color: var(--button-active-text);
+    }
+
+    /* Dark mode adjustments */
+    @media (prefers-color-scheme: dark) {
+        .stock-button:hover {
+            color: var(--button-active);
+        }
+    }
 </style>
 {% endblock %}
 
@@ -529,7 +551,9 @@
                         <tbody>
                             {% for stock, count, current, initial, pct in stock_cnt %}
                             <tr>
-                                <td>{{ stock }}</td>
+                                <td>
+                                    <button class="stock-button hover:underline" data-stock="{{ stock }}">{{ stock }}</button>
+                                </td>
                                 <td>{{ count }}</td>
                                 <td>${{ '{:,.2f}'.format(current) }}</td>
                                 <td>${{ '{:,.2f}'.format(initial) }}</td>
@@ -1196,6 +1220,16 @@
         // Hide all mobile row content initially
         document.querySelectorAll('.mobile-row-content').forEach(content => {
             content.classList.remove('active');
+        });
+    });
+
+    // Add stock button click handler
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.stock-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const stock = this.dataset.stock;
+                window.open(`https://finance.yahoo.com/quote/${stock}`, '_blank');
+            });
         });
     });
 </script>
