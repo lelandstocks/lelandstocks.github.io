@@ -50,7 +50,21 @@
         box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         padding: var(--card-padding);
         margin-bottom: var(--section-spacing);
-        min-height: 450px;
+        height: 500px;  /* Fixed height instead of min-height */
+        display: flex;
+        flex-direction: column;
+    }
+
+    .chart-container {
+        flex: 1;
+        width: 100%;
+        position: relative;
+        min-height: 0;  /* Important for flex child */
+    }
+
+    #stockChart {
+        width: 100% !important;
+        height: 100% !important;
     }
 
     /* Search input improvements */
@@ -439,7 +453,7 @@
 
     // Wrap chart initialization in a function
     function initializeChart() {
-        const chartContainer = document.getElementById('chart-container');
+        const chartContainer = document.getElementById('stockChart');
         
         if (!chartContainer) {
             console.error('Chart container element not found');
@@ -448,8 +462,8 @@
 
         const colors = getChartColors();
         const chartOptions = {
-            width: chartContainer.offsetWidth,
-            height: chartContainer.offsetHeight,
+            width: chartContainer.clientWidth,
+            height: chartContainer.clientHeight,
             layout: {
                 background: { type: 'solid', color: colors.background },
                 textColor: colors.text,
@@ -494,7 +508,7 @@
         // Add color scheme change listener
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateChartColors);
 
-        const chart = LightweightCharts.createChart(document.getElementById('stockChart'), chartOptions);
+        const chart = LightweightCharts.createChart(chartContainer, chartOptions);
 
         const labels = {{ labels | safe }};
         
@@ -632,6 +646,19 @@
                 chart.timeScale().fitContent();
             }, 100);
         });
+
+        // Add resize observer for better size management
+        const resizeObserver = new ResizeObserver(entries => {
+            entries.forEach(entry => {
+                chart.applyOptions({
+                    width: entry.contentRect.width,
+                    height: entry.contentRect.height
+                });
+                chart.timeScale().fitContent();
+            });
+        });
+
+        resizeObserver.observe(chartContainer);
 
         // Update reset zoom handler
         document.getElementById('resetZoom').addEventListener('click', () => {
