@@ -390,28 +390,6 @@
     .uk-table-responsive {
         margin-bottom: 0;
     }
-
-    /* Add stock button styles */
-    .stock-button {
-        background: none;
-        border: none;
-        padding: 0;
-        font: inherit;
-        color: inherit;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-
-    .stock-button:hover {
-        color: var(--button-active-text);
-    }
-
-    /* Dark mode adjustments */
-    @media (prefers-color-scheme: dark) {
-        .stock-button:hover {
-            color: var(--button-active);
-        }
-    }
 </style>
 {% endblock %}
 
@@ -552,10 +530,9 @@
                             {% for stock, count, current, initial, pct in stock_cnt %}
                             <tr>
                                 <td>
-                                    <button type="button" 
-                                            onclick="window.open('https://finance.yahoo.com/quote/{{ stock }}', '_blank')"
-                                            class="stock-button hover:underline focus:outline-none" 
-                                            data-stock="{{ stock }}">{{ stock }}</button>
+                                    <a href="https://finance.yahoo.com/quote/{{ stock }}" 
+                                       target="_blank" 
+                                       class="hover:underline">{{ stock }}</a>
                                 </td>
                                 <td>{{ count }}</td>
                                 <td>${{ '{:,.2f}'.format(current) }}</td>
@@ -725,124 +702,128 @@
         // Add color scheme change listener
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateChartColors);
 
-        // ...existing code...
-
-        // Create the chart first
         const chart = LightweightCharts.createChart(chartContainer, chartOptions);
 
-        // Create and store series with initial visibility
-        const series = {};
-        const legendItems = document.querySelectorAll('.legend-item');
+        const labels = {{ labels | safe }};
+        
+        // Define all series first
+        const sp500Series = chart.addAreaSeries({
+            lineColor: '#FF6384',
+            topColor: 'rgba(255, 99, 132, 0.4)',
+            bottomColor: 'rgba(255, 99, 132, 0.1)',
+            lineWidth: 2,
+        });
+        
+        const q1Series = chart.addAreaSeries({
+            lineColor: '#9966FF',
+            topColor: 'rgba(153, 102, 255, 0.4)',
+            bottomColor: 'rgba(153, 102, 255, 0.1)',
+            lineWidth: 2,
+        });
 
-        // Initialize all series with proper visibility
-        legendItems.forEach(item => {
-            const seriesName = item.dataset.series;
-            const isActive = item.classList.contains('active');
-            
-            const seriesOptions = {
-                lineWidth: 2,
-                visible: isActive,
+        const medianSeries = chart.addAreaSeries({
+            lineColor: '#FFCE56',
+            topColor: 'rgba(255, 206, 86, 0.4)',
+            bottomColor: 'rgba(255, 206, 86, 0.1)',
+            lineWidth: 2,
+        });
+
+        const q3Series = chart.addAreaSeries({
+            lineColor: '#FF9F40',
+            topColor: 'rgba(255, 159, 64, 0.4)',
+            bottomColor: 'rgba(255, 159, 64, 0.1)',
+            lineWidth: 2,
+        });
+
+        const minSeries = chart.addAreaSeries({
+            lineColor: '#4BC0C0',
+            topColor: 'rgba(75, 192, 192, 0.4)',
+            bottomColor: 'rgba(75, 192, 192, 0.1)',
+            lineWidth: 2,
+            visible: false,  // Add this line
+        });
+
+        const maxSeries = chart.addAreaSeries({
+            lineColor: '#36A2EB',
+            topColor: 'rgba(54, 162, 235, 0.4)',
+            bottomColor: 'rgba(54, 162, 235, 0.1)',
+            lineWidth: 2,
+            visible: false,  // Add this line
+        });
+
+        // Create and process data with proper timestamps
+        const sp500Data = labels.map((timeStr, i) => {
+            const date = new Date(timeStr);
+            // Convert to PST
+            const pstDate = convertTZ(date, 'America/Los_Angeles');
+            return {
+                time: Math.floor(pstDate.getTime() / 1000),
+                value: {{ sp500_prices | safe }}[i] || 0
             };
-            
-            // Add specific colors based on series type
-            switch(seriesName) {
-                case 'min':
-                    Object.assign(seriesOptions, {
-                        lineColor: '#4BC0C0',
-                        topColor: 'rgba(75, 192, 192, 0.4)',
-                        bottomColor: 'rgba(75, 192, 192, 0.1)',
-                    });
-                    break;
-                case 'q1':
-                    Object.assign(seriesOptions, {
-                        lineColor: '#9966FF',
-                        topColor: 'rgba(153, 102, 255, 0.4)',
-                        bottomColor: 'rgba(153, 102, 255, 0.1)',
-                    });
-                    break;
-                case 'median':
-                    Object.assign(seriesOptions, {
-                        lineColor: '#FFCE56',
-                        topColor: 'rgba(255, 206, 86, 0.4)',
-                        bottomColor: 'rgba(255, 206, 86, 0.1)',
-                    });
-                    break;
-                case 'q3':
-                    Object.assign(seriesOptions, {
-                        lineColor: '#FF9F40',
-                        topColor: 'rgba(255, 159, 64, 0.4)',
-                        bottomColor: 'rgba(255, 159, 64, 0.1)',
-                    });
-                    break;
-                case 'max':
-                    Object.assign(seriesOptions, {
-                        lineColor: '#36A2EB',
-                        topColor: 'rgba(54, 162, 235, 0.4)',
-                        bottomColor: 'rgba(54, 162, 235, 0.1)',
-                    });
-                    break;
-                case 'sp500':
-                    Object.assign(seriesOptions, {
-                        lineColor: '#FF6384',
-                        topColor: 'rgba(255, 99, 132, 0.4)',
-                        bottomColor: 'rgba(255, 99, 132, 0.1)',
-                    });
-                    break;
-            }
-            
-            series[seriesName] = chart.addAreaSeries(seriesOptions);
-        });
+        }).filter(item => item.value !== 0);
 
-        // Process and set data for each series
-        const seriesData = {
-            min: processTimeData({{ min_monies | safe }}),
-            max: processTimeData({{ max_monies | safe }}),
-            q1: processTimeData({{ q1_monies | safe }}),
-            q3: processTimeData({{ q3_monies | safe }}),
-            median: processTimeData({{ median_monies | safe }}),
-            sp500: processTimeData({{ sp500_prices | safe }})
-        };
+        const q1Data = labels.map((timeStr, i) => {
+            const date = new Date(timeStr);
+            // Convert to PST
+            const pstDate = convertTZ(date, 'America/Los_Angeles');
+            return {
+                time: Math.floor(pstDate.getTime() / 1000),
+                value: {{ q1_monies | safe }}[i] || 0
+            };
+        }).filter(item => item.value !== 0);
 
-        // Helper function to process time series data
-        function processTimeData(data) {
-            return labels.map((timeStr, i) => {
-                const date = new Date(timeStr);
-                const pstDate = convertTZ(date, 'America/Los_Angeles');
-                return {
-                    time: Math.floor(pstDate.getTime() / 1000),
-                    value: data[i] || 0
-                };
-            }).filter(item => item.value !== 0)
-            .sort((a, b) => a.time - b.time);
-        }
+        const medianData = labels.map((timeStr, i) => {
+            const date = new Date(timeStr);
+            // Convert to PST
+            const pstDate = convertTZ(date, 'America/Los_Angeles');
+            return {
+                time: Math.floor(pstDate.getTime() / 1000),
+                value: {{ median_monies | safe }}[i] || 0
+            };
+        }).filter(item => item.value !== 0);
 
-        // Set data for each series
-        Object.keys(series).forEach(key => {
-            series[key].setData(seriesData[key]);
-        });
+        const q3Data = labels.map((timeStr, i) => {
+            const date = new Date(timeStr);
+            // Convert to PST
+            const pstDate = convertTZ(date, 'America/Los_Angeles');
+            return {
+                time: Math.floor(pstDate.getTime() / 1000),
+                value: {{ q3_monies | safe }}[i] || 0
+            };
+        }).filter(item => item.value !== 0);
 
-        // Add legend click handlers
-        legendItems.forEach(item => {
-            item.addEventListener('click', () => {
-                const seriesName = item.dataset.series;
-                if (series[seriesName]) {
-                    item.classList.toggle('active');
-                    const isVisible = item.classList.contains('active');
-                    series[seriesName].applyOptions({
-                        visible: isVisible
-                    });
-                    
-                    // Update trendline visibility if it exists
-                    if (trendSeries[seriesName] && trendlinesVisible) {
-                        trendSeries[seriesName].applyOptions({
-                            visible: isVisible
-                        });
-                    }
-                }
-            });
-        });
+        const minData = labels.map((timeStr, i) => {
+            const date = new Date(timeStr);
+            const pstDate = convertTZ(date, 'America/Los_Angeles');
+            return {
+                time: Math.floor(pstDate.getTime() / 1000),
+                value: {{ min_monies | safe }}[i] || 0
+            };
+        }).filter(item => item.value !== 0);
 
-        // ...rest of the existing code...
+        const maxData = labels.map((timeStr, i) => {
+            const date = new Date(timeStr);
+            const pstDate = convertTZ(date, 'America/Los_Angeles');
+            return {
+                time: Math.floor(pstDate.getTime() / 1000),
+                value: {{ max_monies | safe }}[i] || 0
+            };
+        }).filter(item => item.value !== 0);
+
+        // Sort all data arrays
+        sp500Data.sort((a, b) => a.time - b.time);
+        q1Data.sort((a, b) => a.time - b.time);
+        medianData.sort((a, b) => a.time - b.time);
+        q3Data.sort((a, b) => a.time - b.time);
+        minData.sort((a, b) => a.time - b.time);
+        maxData.sort((a, b) => a.time - b.time);
+
+        sp500Series.setData(sp500Data);
+        q1Series.setData(q1Data);
+        medianSeries.setData(medianData);
+        q3Series.setData(q3Data);
+        minSeries.setData(minData);
+        maxSeries.setData(maxData);
 
         chart.timeScale().fitContent();
 
@@ -1235,16 +1216,6 @@
         // Hide all mobile row content initially
         document.querySelectorAll('.mobile-row-content').forEach(content => {
             content.classList.remove('active');
-        });
-    });
-
-    // Add stock button click handler
-    document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.stock-button').forEach(button => {
-            button.addEventListener('click', function() {
-                const stock = this.dataset.stock;
-                window.open(`https://finance.yahoo.com/quote/${stock}`, '_blank');
-            });
         });
     });
 </script>

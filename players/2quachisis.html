@@ -112,7 +112,7 @@
             </div>
             <div class="text-left sm:text-right">
                 <p class="text-white/80 text-sm">Last Updated</p>
-                <p class="text-base sm:text-lg">18:25:07 12-05-2024</p>
+                <p class="text-base sm:text-lg">18:31:38 12-05-2024</p>
             </div>
         </div>
     </div>
@@ -161,10 +161,9 @@
                             
                             <tr class="hover:bg-secondary transition-colors">
                                 <td class="px-4 py-2 whitespace-nowrap font-medium">
-                                    <button type="button" 
-                                            onclick="window.open('https://finance.yahoo.com/quote/AAPL', '_blank')"
-                                            class="stock-button hover:underline focus:outline-none" 
-                                            data-stock="AAPL">AAPL</button>
+                                    <a href="https://finance.yahoo.com/quote/AAPL" 
+                                       target="_blank" 
+                                       class="hover:underline">AAPL</a>
                                 </td>
                                 <td class="px-4 py-2 whitespace-nowrap text-right text-label">$6,071</td>
                                 <td class="px-4 py-2 whitespace-nowrap text-right text-success">
@@ -174,10 +173,9 @@
                             
                             <tr class="hover:bg-secondary transition-colors">
                                 <td class="px-4 py-2 whitespace-nowrap font-medium">
-                                    <button type="button" 
-                                            onclick="window.open('https://finance.yahoo.com/quote/DUOL', '_blank')"
-                                            class="stock-button hover:underline focus:outline-none" 
-                                            data-stock="DUOL">DUOL</button>
+                                    <a href="https://finance.yahoo.com/quote/DUOL" 
+                                       target="_blank" 
+                                       class="hover:underline">DUOL</a>
                                 </td>
                                 <td class="px-4 py-2 whitespace-nowrap text-right text-label">$1,881</td>
                                 <td class="px-4 py-2 whitespace-nowrap text-right text-success">
@@ -187,10 +185,9 @@
                             
                             <tr class="hover:bg-secondary transition-colors">
                                 <td class="px-4 py-2 whitespace-nowrap font-medium">
-                                    <button type="button" 
-                                            onclick="window.open('https://finance.yahoo.com/quote/RBLX', '_blank')"
-                                            class="stock-button hover:underline focus:outline-none" 
-                                            data-stock="RBLX">RBLX</button>
+                                    <a href="https://finance.yahoo.com/quote/RBLX" 
+                                       target="_blank" 
+                                       class="hover:underline">RBLX</a>
                                 </td>
                                 <td class="px-4 py-2 whitespace-nowrap text-right text-label">$295</td>
                                 <td class="px-4 py-2 whitespace-nowrap text-right text-success">
@@ -656,16 +653,6 @@
                     visible: isVisible && trendlinesVisible
                 });
             }
-        });
-    });
-
-    // Add stock button click handler
-    document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.stock-button').forEach(button => {
-            button.addEventListener('click', function() {
-                const stock = this.dataset.stock;
-                window.open(`https://finance.yahoo.com/quote/${stock}`, '_blank');
-            });
         });
     });
 

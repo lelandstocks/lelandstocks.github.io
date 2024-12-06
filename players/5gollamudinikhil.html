@@ -112,7 +112,7 @@
             </div>
             <div class="text-left sm:text-right">
                 <p class="text-white/80 text-sm">Last Updated</p>
-                <p class="text-base sm:text-lg">18:25:23 12-05-2024</p>
+                <p class="text-base sm:text-lg">18:31:53 12-05-2024</p>
             </div>
         </div>
     </div>
@@ -161,10 +161,9 @@
                             
                             <tr class="hover:bg-secondary transition-colors">
                                 <td class="px-4 py-2 whitespace-nowrap font-medium">
-                                    <button type="button" 
-                                            onclick="window.open('https://finance.yahoo.com/quote/DUOL', '_blank')"
-                                            class="stock-button hover:underline focus:outline-none" 
-                                            data-stock="DUOL">DUOL</button>
+                                    <a href="https://finance.yahoo.com/quote/DUOL" 
+                                       target="_blank" 
+                                       class="hover:underline">DUOL</a>
                                 </td>
                                 <td class="px-4 py-2 whitespace-nowrap text-right text-label">$28,258</td>
                                 <td class="px-4 py-2 whitespace-nowrap text-right text-success">
@@ -174,10 +173,9 @@
                             
                             <tr class="hover:bg-secondary transition-colors">
                                 <td class="px-4 py-2 whitespace-nowrap font-medium">
-                                    <button type="button" 
-                                            onclick="window.open('https://finance.yahoo.com/quote/EA', '_blank')"
-                                            class="stock-button hover:underline focus:outline-none" 
-                                            data-stock="EA">EA</button>
+                                    <a href="https://finance.yahoo.com/quote/EA" 
+                                       target="_blank" 
+                                       class="hover:underline">EA</a>
                                 </td>
                                 <td class="px-4 py-2 whitespace-nowrap text-right text-label">$16,601</td>
                                 <td class="px-4 py-2 whitespace-nowrap text-right text-danger">
@@ -187,10 +185,9 @@
                             
                             <tr class="hover:bg-secondary transition-colors">
                                 <td class="px-4 py-2 whitespace-nowrap font-medium">
-                                    <button type="button" 
-                                            onclick="window.open('https://finance.yahoo.com/quote/IOT', '_blank')"
-                                            class="stock-button hover:underline focus:outline-none" 
-                                            data-stock="IOT">IOT</button>
+                                    <a href="https://finance.yahoo.com/quote/IOT" 
+                                       target="_blank" 
+                                       class="hover:underline">IOT</a>
                                 </td>
                                 <td class="px-4 py-2 whitespace-nowrap text-right text-label">$13,808</td>
                                 <td class="px-4 py-2 whitespace-nowrap text-right text-success">
@@ -200,10 +197,9 @@
                             
                             <tr class="hover:bg-secondary transition-colors">
                                 <td class="px-4 py-2 whitespace-nowrap font-medium">
-                                    <button type="button" 
-                                            onclick="window.open('https://finance.yahoo.com/quote/M', '_blank')"
-                                            class="stock-button hover:underline focus:outline-none" 
-                                            data-stock="M">M</button>
+                                    <a href="https://finance.yahoo.com/quote/M" 
+                                       target="_blank" 
+                                       class="hover:underline">M</a>
                                 </td>
                                 <td class="px-4 py-2 whitespace-nowrap text-right text-label">$3,296</td>
                                 <td class="px-4 py-2 whitespace-nowrap text-right text-success">
@@ -213,10 +209,9 @@
                             
                             <tr class="hover:bg-secondary transition-colors">
                                 <td class="px-4 py-2 whitespace-nowrap font-medium">
-                                    <button type="button" 
-                                            onclick="window.open('https://finance.yahoo.com/quote/RACE', '_blank')"
-                                            class="stock-button hover:underline focus:outline-none" 
-                                            data-stock="RACE">RACE</button>
+                                    <a href="https://finance.yahoo.com/quote/RACE" 
+                                       target="_blank" 
+                                       class="hover:underline">RACE</a>
                                 </td>
                                 <td class="px-4 py-2 whitespace-nowrap text-right text-label">$15,564</td>
                                 <td class="px-4 py-2 whitespace-nowrap text-right text-success">
@@ -226,10 +221,9 @@
                             
                             <tr class="hover:bg-secondary transition-colors">
                                 <td class="px-4 py-2 whitespace-nowrap font-medium">
-                                    <button type="button" 
-                                            onclick="window.open('https://finance.yahoo.com/quote/TTD', '_blank')"
-                                            class="stock-button hover:underline focus:outline-none" 
-                                            data-stock="TTD">TTD</button>
+                                    <a href="https://finance.yahoo.com/quote/TTD" 
+                                       target="_blank" 
+                                       class="hover:underline">TTD</a>
                                 </td>
                                 <td class="px-4 py-2 whitespace-nowrap text-right text-label">$5,170</td>
                                 <td class="px-4 py-2 whitespace-nowrap text-right text-success">
@@ -695,16 +689,6 @@
                     visible: isVisible && trendlinesVisible
                 });
             }
-        });
-    });
-
-    // Add stock button click handler
-    document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.stock-button').forEach(button => {
-            button.addEventListener('click', function() {
-                const stock = this.dataset.stock;
-                window.open(`https://finance.yahoo.com/quote/${stock}`, '_blank');
-            });
         });
     });
 
