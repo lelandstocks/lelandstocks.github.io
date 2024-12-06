@@ -183,10 +183,19 @@
         padding: 0.5rem 1rem;
         font-weight: 500;
         transition: all 0.2s ease;
+        cursor: pointer;
+        border: 1px solid #e5e7eb;
     }
 
     .uk-button:hover {
         transform: translateY(-1px);
+        background-color: #f3f4f6;
+    }
+
+    .uk-button.active {
+        background-color: #3b82f6;
+        color: white;
+        border-color: #3b82f6;
     }
 
     /* Responsive improvements */
@@ -388,6 +397,19 @@
         .collapsible-content {
             background-color: rgba(0, 0, 0, 0.2);
         }
+
+        .uk-button {
+            border-color: #374151;
+        }
+
+        .uk-button:hover {
+            background-color: #374151;
+        }
+
+        .uk-button.active {
+            background-color: #2563eb;
+            border-color: #2563eb;
+        }
     }
 
     /* Extra small device improvements */
@@ -465,7 +487,7 @@
 <div class="page-header">
     <div class="container mx-auto px-4">
         <h1 class="text-4xl font-bold text-center mb-2">Quicksilver Stock Exchange</h1>
-        <p class="text-center text-lg opacity-90">Last updated 17:19:13 12-05-2024</p>
+        <p class="text-center text-lg opacity-90">Last updated 17:22:10 12-05-2024</p>
         <div class="text-center mt-4 flex items-center justify-center gap-2">
             <span class="text-sm font-medium opacity-90">Created by</span>
             <span class="font-semibold">Pinak Paliwal</span>
@@ -6668,9 +6690,17 @@
             });
         });
 
-        // Add time range functionality
+        // Add time range functionality with active state
         document.querySelectorAll('.time-range').forEach(button => {
             button.addEventListener('click', () => {
+                // Remove active class from all time range buttons
+                document.querySelectorAll('.time-range').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                // Add active class to clicked button
+                button.classList.add('active');
+                
                 const days = parseInt(button.dataset.days);
                 const now = Math.floor(Date.now() / 1000);
                 const start = now - (days * 24 * 60 * 60);
@@ -6736,6 +6766,7 @@
         document.getElementById('toggleTrendlines').addEventListener('click', function() {
             trendlinesVisible = !trendlinesVisible;
             this.classList.toggle('active');
+            this.textContent = this.classList.contains('active') ? 'Hide Trends' : 'Show Trends';
 
             Object.keys(series).forEach(key => {
                 if (series[key].options().visible) {
