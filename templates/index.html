@@ -909,23 +909,39 @@
 
         // Store series in an object for easy access
         const series = {
-            sp500: sp500Series,
-            q1: q1Series,
-            median: medianSeries,
-            q3: q3Series,
             min: minSeries,
-            max: maxSeries
+            max: maxSeries,
+            q1: q1Series,
+            q3: q3Series,
+            median: medianSeries,
+            sp500: sp500Series
         };
 
         // Replace button toggle functionality with legend toggle
         document.querySelectorAll('.legend-item').forEach(item => {
+            // Initial visibility based on 'active' class
+            const seriesName = item.dataset.series;
+            if (series[seriesName]) {
+                series[seriesName].applyOptions({
+                    visible: item.classList.contains('active')
+                });
+            }
+
             item.addEventListener('click', () => {
                 const seriesName = item.dataset.series;
-                item.classList.toggle('active');
-                const isVisible = item.classList.contains('active');
-                series[seriesName].applyOptions({
-                    visible: isVisible
-                });
+                if (series[seriesName]) {
+                    item.classList.toggle('active');
+                    const isVisible = item.classList.contains('active');
+                    series[seriesName].applyOptions({
+                        visible: isVisible
+                    });
+                    // Update trendline if it exists and trendlines are visible
+                    if (trendSeries[seriesName] && trendlinesVisible) {
+                        trendSeries[seriesName].applyOptions({
+                            visible: isVisible
+                        });
+                    }
+                }
             });
         });
 

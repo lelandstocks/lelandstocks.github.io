@@ -509,7 +509,7 @@
 <div class="page-header">
     <div class="container mx-auto px-4">
         <h1 class="text-4xl font-bold text-center mb-2">Quicksilver Stock Exchange</h1>
-        <p class="text-center text-lg opacity-90">Last updated 18:08:22 12-05-2024</p>
+        <p class="text-center text-lg opacity-90">Last updated 18:12:13 12-05-2024</p>
         <div class="text-center mt-4 flex items-center justify-center gap-2">
             <span class="text-sm font-medium opacity-90">Created by</span>
             <span class="font-semibold">Pinak Paliwal</span>
@@ -7821,23 +7821,39 @@
 
         // Store series in an object for easy access
         const series = {
-            sp500: sp500Series,
-            q1: q1Series,
-            median: medianSeries,
-            q3: q3Series,
             min: minSeries,
-            max: maxSeries
+            max: maxSeries,
+            q1: q1Series,
+            q3: q3Series,
+            median: medianSeries,
+            sp500: sp500Series
         };
 
         // Replace button toggle functionality with legend toggle
         document.querySelectorAll('.legend-item').forEach(item => {
+            // Initial visibility based on 'active' class
+            const seriesName = item.dataset.series;
+            if (series[seriesName]) {
+                series[seriesName].applyOptions({
+                    visible: item.classList.contains('active')
+                });
+            }
+
             item.addEventListener('click', () => {
                 const seriesName = item.dataset.series;
-                item.classList.toggle('active');
-                const isVisible = item.classList.contains('active');
-                series[seriesName].applyOptions({
-                    visible: isVisible
-                });
+                if (series[seriesName]) {
+                    item.classList.toggle('active');
+                    const isVisible = item.classList.contains('active');
+                    series[seriesName].applyOptions({
+                        visible: isVisible
+                    });
+                    // Update trendline if it exists and trendlines are visible
+                    if (trendSeries[seriesName] && trendlinesVisible) {
+                        trendSeries[seriesName].applyOptions({
+                            visible: isVisible
+                        });
+                    }
+                }
             });
         });
 
