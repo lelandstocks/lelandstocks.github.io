@@ -1,0 +1,1025 @@
+{% extends "base.html" %}
+
+{% block title %}{{ player_name }}'s Portfolio{% endblock %}
+
+{% block content %}
+<!-- Player Info Header -->
+<div class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 px-4 mb-6">
+    <div class="container mx-auto">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div class="flex items-center space-x-3">
+                {% if player_name == 'teachermiller' %}
+                <img src="/static/miller.jpg" alt="Mr. Miller" class="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-white player-avatar">
+                {% else %}
+                <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-white/20 flex items-center justify-center text-xl sm:text-2xl font-bold">
+                    {{ player_name[0] | upper }}
+                </div>
+                {% endif %}
+                <div>
+                    <h1 class="text-xl sm:text-2xl font-bold mb-1">{{ player_name }}</h1>
+                    <a href="{{ investopedia_link }}" class="text-white/80 hover:text-white text-sm underline" target="_blank">View Investopedia Profile</a>
+                </div>
+            </div>
+            <div class="text-left sm:text-right">
+                <p class="text-white/80 text-sm">Last Updated</p>
+                <p class="text-base sm:text-lg">{{ update_time }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Grid Layout -->
+<div class="container mx-auto px-4">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 min-h-[calc(100vh-12rem)]">
+        <!-- Left Panel -->
+        <div class="lg:col-span-3 space-y-4 order-2 lg:order-1">
+            <!-- Performance Cards -->
+            <div class="bg-card rounded-lg shadow p-4 sm:p-6">
+                <h2 class="text-primary text-lg sm:text-xl font-bold mb-4">Portfolio Overview</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-4">
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <h3 class="label-text">Current Value</h3>
+                        <p class="text-primary text-xl sm:text-2xl font-bold">${{ '{:,.2f}'.format(player_money[-1]) }}</p>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <h3 class="label-text">Total Return</h3>
+                        {% set total_return = ((player_money[-1] - 100000) / 100000) * 100 %}
+                        <p class="text-xl sm:text-2xl font-bold {% if total_return >= 0 %}text-success{% else %}text-danger{% endif %}">
+                            {{ '{:+.2f}%'.format(total_return) }}
+                        </p>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <h3 class="label-text">Active Positions</h3>
+                        <p class="text-primary text-xl sm:text-2xl font-bold">{{ player_stocks|length }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Holdings Table -->
+            <div class="bg-card rounded-lg shadow p-4 sm:p-6 overflow-x-auto">
+                <h2 class="text-primary text-xl font-bold mb-4">Current Holdings</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full">
+                        <thead class="bg-secondary">
+                            <tr>
+                                <th class="px-4 py-2 text-left text-xs font-medium uppercase label-text">Symbol</th>
+                                <th class="px-4 py-2 text-right text-xs font-medium uppercase label-text">Value</th>
+                                <th class="px-4 py-2 text-right text-xs font-medium uppercase label-text">Return</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-card divide-y divide-border">
+                            {% for stock in player_stocks %}
+                            <tr class="hover:bg-secondary transition-colors">
+                                <td class="px-4 py-2 whitespace-nowrap font-medium">
+                                    <a href="https://finance.yahoo.com/quote/{{ stock[0] }}" 
+                                       target="_blank" 
+                                       class="hover:underline">{{ stock[0] }}</a>
+                                </td>
+                                <td class="px-4 py-2 whitespace-nowrap text-right text-label">${{ '{:,.0f}'.format(stock[1]) }}</td>
+                                <td class="px-4 py-2 whitespace-nowrap text-right {% if stock[2] >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                    {{ '{:+.1f}%'.format(stock[2]) }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel (Chart) -->
+        <div class="lg:col-span-9 order-1 lg:order-2">
+            <div class="bg-card rounded-lg shadow p-4 sm:p-6 h-full min-h-[400px] lg:min-h-[500px]">
+                <!-- Chart Controls -->
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+                    <div class="legend grid grid-cols-2 xs:grid-cols-3 sm:flex sm:flex-row gap-2 w-full sm:w-auto">
+                        {% for series in [
+                            ('portfolio', 'Portfolio', 'rgb(75, 192, 192)'),
+                            ('sp500', 'S&P 500', 'rgb(192, 75, 75)'),
+                            ('tqqq', 'TQQQ', 'rgb(75, 75, 192)'),
+                            ('nvda', 'NVDA', 'rgb(0, 192, 0)'),
+                            ('djt', 'DJT', 'rgb(192, 192, 0)')
+                        ] %}
+                        <button class="uk-button uk-button-default px-3 py-1 text-sm legend-button {{ 'active' if loop.index <= 2 else '' }}" data-series="{{ series[0] }}">
+                            <span class="inline-block w-2 h-2 rounded-full mr-1" style="background: {{ series[2] }}"></span>
+                            {{ series[1] }}
+                        </button>
+                        {% endfor %}
+                    </div>
+                    <div class="flex flex-wrap gap-2 justify-center sm:justify-start">
+                        <button class="uk-button uk-button-default px-3 py-1 text-sm" id="toggleTrendlines">Show Trends</button>
+                        <button class="uk-button uk-button-default px-3 py-1 text-sm" id="resetZoom">Reset</button>
+                        {% for period in [('1D', 1), ('1W', 7), ('1M', 30), ('1Y', 365)] %}
+                        <button class="uk-button uk-button-default px-3 py-1 text-sm time-range" data-days="{{ period[1] }}">{{ period[0] }}</button>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- Chart Container -->
+                <div class="h-[calc(100%-4rem)]" id="chartContainer">
+                    <div id="playerChart" class="w-full h-full"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function convertTZ(date, tzString) {
+        return new Date((typeof date === "string" ? new Date(date) : date).toLocaleString("en-US", {timeZone: tzString}));   
+    }
+
+    function isDarkMode() {
+        return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+
+    function getChartColors() {
+        const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        return {
+            background: isDark ? '#1f2937' : '#ffffff',
+            text: isDark ? '#f9fafb' : '#111827',
+            grid: isDark ? '#374151' : '#f0f0f0',
+            border: isDark ? '#4b5563' : '#d1d4dc'
+        };
+    }
+
+    function updateChartColors() {
+        const colors = getChartColors();
+        chart.applyOptions({
+            layout: {
+                background: { type: 'solid', color: colors.background },
+                textColor: colors.text,
+            },
+            grid: {
+                vertLines: { color: colors.grid },
+                horzLines: { color: colors.grid },
+            },
+            timeScale: {
+                borderColor: colors.border,
+            },
+            rightPriceScale: {
+                borderColor: colors.border,
+            }
+        });
+    }
+
+    const chartContainer = document.getElementById('chartContainer');
+    const colors = getChartColors();
+    const chartOptions = {
+        width: chartContainer.offsetWidth,
+        height: chartContainer.offsetHeight,
+        layout: {
+            background: { type: 'solid', color: colors.background },
+            textColor: colors.text,
+            fontSize: 12,
+        },
+        grid: {
+            vertLines: { color: colors.grid },
+            horzLines: { color: colors.grid },
+        },
+        timeScale: {
+            timeVisible: true,
+            borderColor: colors.border,
+            rightOffset: 5,
+            barSpacing: 10,
+            fixLeftEdge: true,
+            fixRightEdge: true,
+            secondsVisible: false,
+            timeZone: 'America/Los_Angeles',  // Add this line
+        },
+        rightPriceScale: {
+            borderColor: colors.border,
+            autoScale: true,
+        },
+        watermark: {
+            color: 'rgba(0, 0, 0, 0)',
+        },
+        leftPriceScale: {
+            visible: false,
+        },
+        handleScale: {
+            mouseWheel: true,
+            pinch: true,
+            axisPressedMouseMove: true,
+        },
+        handleScroll: {
+            mouseWheel: true,
+            pressedMouseMove: true,
+            horzTouchDrag: true,
+            vertTouchDrag: true,
+        },
+    };
+
+    // Add color scheme change listener
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateChartColors);
+
+    const chart = LightweightCharts.createChart(document.getElementById('playerChart'), chartOptions);
+
+    const portfolioSeries = chart.addAreaSeries({
+        lineColor: 'rgb(75, 192, 192)',
+        topColor: 'rgba(75, 192, 192, 0.4)',
+        bottomColor: 'rgba(75, 192, 192, 0.1)',
+        lineWidth: 2,
+    });
+
+    const sp500Series = chart.addAreaSeries({
+        lineColor: 'rgb(192, 75, 75)',
+        topColor: 'rgba(192, 75, 75, 0.4)',
+        bottomColor: 'rgba(192, 75, 75, 0.1)',
+        lineWidth: 2,
+    });
+
+    const tqqqSeries = chart.addAreaSeries({
+        lineColor: 'rgb(75, 75, 192)',
+        topColor: 'rgba(75, 75, 192, 0.4)',
+        bottomColor: 'rgba(75, 75, 192, 0.1)',
+        lineWidth: 2,
+        visible: false,  // Add this line
+    });
+
+    const nvdaSeries = chart.addAreaSeries({
+        lineColor: 'rgb(0, 192, 0)',
+        topColor: 'rgba(0, 192, 0, 0.4)',
+        bottomColor: 'rgba(0, 192, 0, 0.1)',
+        lineWidth: 2,
+        visible: false,  // Add this line
+    });
+
+    const djtSeries = chart.addAreaSeries({
+        lineColor: 'rgb(192, 192, 0)',
+        topColor: 'rgba(192, 192, 0, 0.4)',
+        bottomColor: 'rgba(192, 192, 0, 0.1)',
+        lineWidth: 2,
+        visible: false,  // Add this line
+    });
+
+    const labels = {{ labels | safe }};
+    const money = {{ player_money | safe }};
+    const sp500Data = {{ sp500_prices | safe }};
+    const tqqqData = {{ tqqq_prices | safe }};
+    const nvdaData = {{ nvda_prices | safe }};
+    const djtData = {{ djt_prices | safe }};
+
+    const portfolioData = labels.map((timeStr, i) => {
+        const date = new Date(timeStr);
+        // Convert to PST
+        const pstDate = convertTZ(date, 'America/Los_Angeles');
+        return {
+            time: Math.floor(date.getTime() / 1000),
+            value: money[i] || 0
+        };
+    }).filter(item => item.value !== 0);
+
+    const sp500ChartData = labels.map((timeStr, i) => {
+        const date = new Date(timeStr);
+        // Convert to PST
+        const pstDate = convertTZ(date, 'America/Los_Angeles');
+        return {
+            time: Math.floor(date.getTime() / 1000),
+            value: sp500Data[i] || 0
+        };
+    }).filter(item => item.value !== 0);
+
+    const tqqqChartData = labels.map((timeStr, i) => {
+        const date = new Date(timeStr);
+        // Convert to PST
+        const pstDate = convertTZ(date, 'America/Los_Angeles');
+        return {
+            time: Math.floor(date.getTime() / 1000),
+            value: tqqqData[i] || 0
+        };
+    }).filter(item => item.value !== 0);
+
+    const nvdaChartData = labels.map((timeStr, i) => {
+        const date = new Date(timeStr);
+        // Convert to PST
+        const pstDate = convertTZ(date, 'America/Los_Angeles');
+        return {
+            time: Math.floor(date.getTime() / 1000),
+            value: nvdaData[i] || 0
+        };
+    }).filter(item => item.value !== 0);
+
+    const djtChartData = labels.map((timeStr, i) => {
+        const date = new Date(timeStr);
+        // Convert to PST
+        const pstDate = convertTZ(date, 'America/Los_Angeles');
+        return {
+            time: Math.floor(date.getTime() / 1000),
+            value: djtData[i] || 0
+        };
+    }).filter(item => item.value !== 0);
+
+    // Sort data by timestamp
+    portfolioData.sort((a, b) => a.time - b.time);
+    sp500ChartData.sort((a, b) => a.time - b.time);
+    tqqqChartData.sort((a, b) => a.time - b.time);
+    nvdaChartData.sort((a, b) => a.time - b.time);
+    djtChartData.sort((a, b) => a.time - b.time);
+
+    portfolioSeries.setData(portfolioData);
+    sp500Series.setData(sp500ChartData);
+    tqqqSeries.setData(tqqqChartData);
+    nvdaSeries.setData(nvdaChartData);
+    djtSeries.setData(djtChartData);
+
+    chart.timeScale().fitContent();
+
+    // Improve resize handler
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+        if (resizeTimeout) clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            const parent = chartContainer.parentElement;
+            chart.applyOptions({
+                width: parent.offsetWidth,
+                height: parent.offsetHeight
+            });
+            chart.timeScale().fitContent();
+        }, 100);
+    });
+
+    // Add reset zoom button functionality
+    document.getElementById('resetZoom').addEventListener('click', () => {
+        chart.timeScale().fitContent();
+        chart.priceScale('right').applyOptions({
+            autoScale: true
+        });
+    });
+
+    // Add time range functionality
+    document.querySelectorAll('.time-range').forEach(button => {
+        button.addEventListener('click', () => {
+            const days = parseInt(button.dataset.days);
+            const now = Math.floor(Date.now() / 1000);
+            const start = now - (days * 24 * 60 * 60);
+            
+            chart.timeScale().setVisibleRange({
+                from: start,
+                to: now,
+            });
+        });
+    });
+
+    // Store series in an object for easy access
+    const series = {
+        portfolio: portfolioSeries,
+        sp500: sp500Series,
+        tqqq: tqqqSeries,
+        nvda: nvdaSeries,
+        djt: djtSeries
+    };
+
+    // Replace button toggle functionality with legend toggle
+    document.querySelectorAll('.legend-button').forEach(button => {
+        button.addEventListener('click', () => {
+            const seriesName = button.dataset.series;
+            button.classList.toggle('active');
+            const isVisible = button.classList.contains('active');
+            series[seriesName].applyOptions({
+                visible: isVisible
+            });
+        });
+    });
+
+    // Initial fit content
+    chart.timeScale().fitContent();
+
+    // Add table sorting functionality (same code as index.html)
+    document.addEventListener('DOMContentLoaded', function() {
+        function getTableCellValue(tr, idx) {
+            const td = tr.children[idx];
+            const text = td.innerText || td.textContent;
+            let value = text.replace(/[$,]/g, '');
+            
+            // If cell contains a link, get text from link
+            const link = td.querySelector('a');
+            if (link) return link.textContent.toLowerCase();
+            
+            // Handle percentage values 
+            if (value.includes('%')) {
+                value = value.replace(/%/, '');
+                return parseFloat(value);
+            }
+
+            // Return number or lowercase string
+            return isNaN(value) ? text.toLowerCase() : parseFloat(value);
+        }
+
+        function comparer(idx, asc) {
+            return function(a, b) {
+                const valA = getTableCellValue(asc ? a : b, idx);
+                const valB = getTableCellValue(asc ? b : a, idx);
+                return typeof valA === 'number' 
+                    ? valA - valB 
+                    : valA.localeCompare(valB);
+            };
+        }
+
+        document.querySelectorAll('table').forEach(table => {
+            const headers = table.querySelectorAll('th');
+            headers.forEach((th, idx) => {
+                if (th.classList.contains('no-sort')) return;
+                
+                th.style.cursor = 'pointer';
+                const span = document.createElement('span');
+                span.className = 'sort-icon both';
+                th.appendChild(span);
+                
+                let ascending = true;
+                th.addEventListener('click', () => {
+                    const tbody = table.querySelector('tbody');
+                    Array.from(tbody.querySelectorAll('tr'))
+                        .sort(comparer(idx, ascending = !ascending))
+                        .forEach(tr => tbody.appendChild(tr));
+
+                    headers.forEach(h => {
+                        const icon = h.querySelector('.sort-icon');
+                        if (icon) icon.className = 'sort-icon both';
+                    });
+
+                    span.className = `sort-icon ${ascending ? 'asc' : 'desc'}`;
+                });
+            });
+        });
+    });
+
+    function calculateTrendline(data) {
+        const n = data.length;
+        if (n < 2) return null;
+
+        let sumX = 0;
+        let sumY = 0;
+        let sumXY = 0;
+        let sumX2 = 0;
+
+        data.forEach(point => {
+            sumX += point.time;
+            sumY += point.value;
+            sumXY += point.time * point.value;
+            sumX2 += point.time * point.time;
+        });
+
+        const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+        const intercept = (sumY - slope * sumX) / n;
+
+        return {
+            start: { time: data[0].time, value: slope * data[0].time + intercept },
+            end: { time: data[n-1].time, value: slope * data[n-1].time + intercept }
+        };
+    }
+
+    const trendSeries = {};
+    let trendlinesVisible = false;
+
+    document.getElementById('toggleTrendlines').addEventListener('click', function() {
+        trendlinesVisible = !trendlinesVisible;
+        this.classList.toggle('active');
+
+        Object.keys(series).forEach(key => {
+            if (series[key].options().visible) {
+                if (trendlinesVisible) {
+                    if (!trendSeries[key]) {
+                        const trendline = calculateTrendline(key === 'portfolio' ? portfolioData : 
+                                                           key === 'sp500' ? sp500ChartData :
+                                                           key === 'tqqq' ? tqqqChartData :
+                                                           key === 'nvda' ? nvdaChartData : 
+                                                           djtChartData);
+                        if (trendline) {
+                            trendSeries[key] = chart.addLineSeries({
+                                color: series[key].options().lineColor,
+                                lineWidth: 1,
+                                lineStyle: 2, // Dashed line
+                            });
+                            trendSeries[key].setData([trendline.start, trendline.end]);
+                        }
+                    } else {
+                        trendSeries[key].applyOptions({ visible: true });
+                    }
+                } else if (trendSeries[key]) {
+                    trendSeries[key].applyOptions({ visible: false });
+                }
+            }
+        });
+    });
+
+    // Update legend click handler
+    document.querySelectorAll('.legend-button').forEach(button => {
+        button.addEventListener('click', () => {
+            const seriesName = button.dataset.series;
+            button.classList.toggle('active');
+            const isVisible = button.classList.contains('active');
+            series[seriesName].applyOptions({
+                visible: isVisible
+            });
+            if (trendSeries[seriesName]) {
+                trendSeries[seriesName].applyOptions({
+                    visible: isVisible && trendlinesVisible
+                });
+            }
+        });
+    });
+
+</script>
+{% endblock %}
+
+{% block styles %}
+<style>
+/* Light mode styles */
+:root {
+    --bg-card: #ffffff;
+    --bg-secondary: #f9fafb;
+    --text-primary: #111827;
+    --text-secondary: #6b7280;
+    --border-color: #e5e7eb;
+    --success-color: #22c55e;
+    --danger-color: #ef4444;
+    --button-hover: #f3f4f6;
+    --button-active: #dbeafe;
+    --button-active-text: #1d4ed8;
+    --label-color: #6b7280;
+    --chart-bg: #ffffff;
+    --text-label: #374151;  /* Add this line */
+    --card-radius: 1rem;
+    --transition-speed: 0.2s;
+    --glass-bg: rgba(255, 255, 255, 0.02);
+    --glass-border: rgba(255, 255, 255, 0.05);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    --card-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.1);
+    --hover-transform: translateY(-4px);
+}
+
+/* Dark mode styles */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-card: #1f2937;
+        --bg-secondary: #111827;
+        --text-primary: #f9fafb;
+        --text-secondary: #9ca3af;
+        --border-color: #374151;
+        --success-color: #4ade80;
+        --danger-color: #f87171;
+        --button-hover: #374151;
+        --button-active: #1e3a8a;
+        --button-active-text: #bfdbfe;
+        --label-color: #9ca3af;
+        --chart-bg: #1f2937;
+        --text-label: #e5e7eb;  /* Add this line */
+        --glass-bg: rgba(0, 0, 0, 0.2);
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        --card-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Remove this override since we're now using bg-card */
+    .bg-white {
+        background-color: var(--bg-card) !important;
+    }
+
+    .bg-gray-50 {
+        background-color: var(--bg-secondary) !important;
+    }
+
+    .text-gray-500 {
+        color: var(--text-secondary) !important;
+    }
+
+    .divide-gray-200 > * + * {
+        border-color: var(--border-color) !important;
+    }
+
+    .hover\:bg-gray-50:hover {
+        background-color: var(--bg-secondary) !important;
+    }
+
+    .shadow {
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3) !important;
+    }
+
+    .uk-button {
+        @apply bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700;
+    }
+
+    .uk-button.active {
+        @apply bg-blue-900 border-blue-800 text-blue-200;
+    }
+
+    .text-sm {
+        color: var(--label-color);
+    }
+
+    .bg-card {
+        background: var(--glass-bg);
+    }
+
+    .bg-secondary {
+        background: var(--glass-bg);
+    }
+
+    .uk-button {
+        background: var(--glass-bg);
+    }
+
+    .uk-button.active {
+        box-shadow: 0 0 16px rgba(37, 99, 235, 0.4);
+    }
+}
+
+/* Existing legend styles */
+.legend-item {
+    @apply flex items-center px-2 py-1 rounded text-xs sm:text-sm font-medium transition-all;
+    opacity: 0.5;
+    color: var(--text-primary);
+}
+
+.legend-item.active {
+    background-color: var(--bg-secondary);
+    opacity: 1;
+}
+
+.legend-color {
+    @apply inline-block w-2 h-2 rounded-full mr-1 shrink-0;
+}
+
+.legend-text {
+    @apply truncate;
+    color: var(--text-primary);
+}
+
+/* Button styles */
+.uk-button {
+    @apply text-xs sm:text-sm rounded border transition-colors whitespace-nowrap;
+    border-color: var(--border-color);
+    color: var(--text-primary);
+    background-color: var(--bg-card);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--glass-border);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.uk-button:hover {
+    background-color: var(--button-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.uk-button.active {
+    background-color: var(--button-active);
+    color: var(--button-active-text);
+    border-color: var(--button-active);
+    box-shadow: 0 0 12px rgba(37, 99, 235, 0.3);
+}
+
+/* Utility classes for text colors */
+.text-primary {
+    color: var(--text-primary);
+}
+
+.text-secondary {
+    color: var(--text-secondary);
+}
+
+.text-success {
+    color: var (--success-color);
+    transition: color 0.3s ease;
+}
+
+.text-danger {
+    color: var(--danger-color);
+    transition: color 0.3s ease;
+}
+
+.divide-border {
+    border-color: var(--border-color);
+}
+
+/* Update label styles */
+.label-text {
+    color: var(--label-color);
+    @apply text-sm font-medium;
+}
+
+/* Add new utility class */
+.text-label {
+    color: var(--text-label);
+}
+
+/* Remove old legend styles and update button styles */
+.uk-button.legend-button.active {
+    background-color: var(--button-active);
+    color: var(--button-active-text);
+    border-color: var(--button-active);
+    box-shadow: 0 0 12px rgba(37, 99, 235, 0.3);
+}
+
+/* Base styles */
+:root {
+    --card-radius: 1rem;
+    --transition-speed: 0.2s;
+}
+
+/* Card styles */
+.bg-card {
+    border-radius: var(--card-radius);
+    transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bg-card:hover {
+    transform: var(--hover-transform);
+    box-shadow: var(--card-shadow);
+}
+
+/* Portfolio overview cards */
+.bg-secondary {
+    border-radius: 0.75rem;
+    transition: all var(--transition-speed);
+    background: var(--glass-bg);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--glass-border);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bg-secondary:hover {
+    transform: scale(1.02);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: var(--glass-shadow);
+}
+
+/* Table styles */
+table {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    background: var(--glass-bg);
+    backdrop-filter: blur(8px);
+}
+
+th {
+    background-color: var(--bg-secondary);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    border-bottom: 2px solid var(--glass-border);
+}
+
+tr {
+    transition: background-color var(--transition-speed);
+}
+
+tr:hover td {
+    background-color: var(--button-hover);
+    background: var(--glass-bg);
+}
+
+td, th {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* Chart controls */
+.legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.legend-button {
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    font-weight: 500;
+    transition: all var(--transition-speed);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--glass-border);
+    padding: 0.625rem 1.25rem;
+    font-weight: 500;
+}
+
+.legend-button:hover {
+    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.legend-button.active {
+    background-color: var(--button-active);
+    color: var(--button-active-text);
+    border-color: var(--button-active);
+    background: var(--button-active);
+    border-color: transparent;
+    box-shadow: 0 0 12px rgba(37, 99, 235, 0.3);
+}
+
+.time-range, #resetZoom {
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    font-weight: 500;
+    transition: all var(--transition-speed);
+}
+
+.time-range:hover, #resetZoom:hover {
+    transform: translateY(-1px);
+    background-color: var(--button-hover);
+}
+
+/* Header styles */
+.bg-gradient-to-r {
+    background-image: linear-gradient(135deg, #4f46e5, #2563eb);
+    background-image: linear-gradient(135deg, #4f46e5, #2563eb, #1d4ed8);
+    position: relative;
+    overflow: hidden;
+}
+
+.bg-gradient-to-r::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at top right, rgba(255,255,255,0.1) 0%, transparent 60%);
+}
+
+/* Player image/avatar */
+.player-avatar {
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    transition: transform var(--transition-speed);
+    border: 3px solid var(--glass-border);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.player-avatar:hover {
+    transform: scale(1.05);
+    transform: scale(1.1) rotate(5deg);
+    border-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Better scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+    border-radius: 4px;
+    background: var(--glass-bg);
+    border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+    background: var(--glass-border);
+    border-radius: 8px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+    background: var(--text-secondary);
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+
+/* Dark mode refinements */
+@media (prefers-color-scheme: dark) {
+    .bg-card {
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+    
+    .bg-secondary {
+        background-color: rgba(17, 24, 39, 0.6);
+    }
+    
+    .player-avatar {
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+}
+
+/* Add new sorting icon styles */
+.sort-icon {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    margin-left: 0.5em;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+}
+
+.sort-icon.asc {
+    border-bottom: 4px solid currentColor;
+    border-top: none;
+}
+
+.sort-icon.desc {
+    border-top: 4px solid currentColor;
+    border-bottom: none; 
+}
+
+.sort-icon.both {
+    position: relative;
+}
+
+.sort-icon.both::before {
+    content: '';
+    position: absolute; 
+    left: -4px;
+    top: -6px;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-bottom: 4px solid currentColor;
+}
+
+.sort-icon.both::after {
+    content: '';
+    position: absolute;
+    left: -4px;
+    bottom: -6px;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 4px solid currentColor;
+}
+
+/* Add responsive chart heights */
+@media (max-width: 640px) {
+    .bg-card {
+        min-height: 350px;
+    }
+}
+
+/* Add responsive adjustments */
+@media (max-width: 640px) {
+    .uk-button {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+    
+    .legend-button {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+    
+    table {
+        font-size: 0.875rem;
+    }
+    
+    td, th {
+        padding: 0.5rem;
+    }
+    
+    .container {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+}
+
+/* Add container max width for very small devices */
+@media (max-width: 360px) {
+    .container {
+        padding-left: 0.25rem;
+        padding-right: 0.25rem;
+    }
+    
+    .legend {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .uk-button, .legend-button {
+        padding: 0.25rem;
+        font-size: 0.7rem;
+    }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+    .bg-card {
+        min-height: 400px;
+    }
+}
+
+@media (min-width: 1025px) {
+    .bg-card {
+        min-height: 500px;
+    }
+}
+
+</style>
+{% endblock %}

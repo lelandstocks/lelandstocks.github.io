@@ -1,0 +1,1222 @@
+{% extends "base.html" %}
+
+{% block title %}The Leaderboard of the Great Quicksilver Stock Exchange{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Base styling improvements */
+    :root {
+        --card-padding: 1.75rem;
+        --card-padding-mobile: 1rem;
+        --container-padding: 1.5rem;
+        --section-spacing: 2rem;
+    }
+
+    /* Header improvements */
+    .page-header {
+        background: linear-gradient(135deg, #6366f1 0%, #3b82f6 100%);
+        padding: 3rem var(--container-padding);
+        color: white;
+        margin-bottom: var(--section-spacing);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Container improvements */
+    .container {
+        max-width: 1440px;
+        padding-left: max(var(--container-padding), env(safe-area-inset-left));
+        padding-right: max(var(--container-padding), env(safe-area-inset-right));
+        margin: 0 auto;
+        width: 100%;
+    }
+
+    /* Card improvements */
+    .stats-card {
+        background: white;
+        border-radius: 0.75rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        padding: var(--card-padding);
+        margin-bottom: var(--section-spacing);
+        transition: box-shadow 0.3s ease;
+    }
+
+    .stats-card:hover {
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    }
+
+    /* Chart wrapper improvements */
+    .chart-wrapper {
+        background: white;
+        border-radius: 0.75rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        padding: var(--card-padding);
+        margin-bottom: var(--section-spacing);
+        height: min(500px, 70vh);  /* Responsive height */
+        display: flex;
+        flex-direction: column;
+    }
+
+    .chart-container {
+        flex: 1;
+        width: 100%;
+        position: relative;
+        min-height: 0;  /* Important for flex child */
+    }
+
+    #stockChart {
+        width: 100% !important;
+        height: 100% !important;
+    }
+
+    /* Search input improvements */
+    #accountSearch {
+        background-color: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.75rem;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        width: 100%;
+        max-width: 36rem;
+        margin: 0 auto 2rem;
+        transition: all 0.3s ease;
+    }
+
+    #accountSearch:focus {
+        outline: none;
+        border-color: #6366f1;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    /* Table improvements */
+    table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    th, td {
+        padding: 1rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    th {
+        font-weight: 600;
+        text-align: left;
+        color: #4b5563;
+        background-color: #f9fafb;
+    }
+
+    tr:last-child td {
+        border-bottom: none;
+    }
+
+    /* Legend improvements */
+    .legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+        padding: 0.5rem;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.5rem;
+        background-color: #f3f4f6;
+        transition: all 0.2s ease;
+    }
+
+    .legend-item:hover {
+        background-color: #e5e7eb;
+    }
+
+    /* Button improvements */
+    .uk-button {
+        border-radius: 0.5rem;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        border: 1px solid #e5e7eb;
+    }
+
+    .uk-button:hover {
+        transform: translateY(-1px);
+        background-color: #f3f4f6;
+    }
+
+    .uk-button.active {
+        background-color: #3b82f6;
+        color: white;
+        border-color: #3b82f6;
+    }
+
+    /* Responsive improvements */
+    @media (max-width: 768px) {
+        :root {
+            --card-padding: var(--card-padding-mobile);
+            --container-padding: 1rem;
+            --section-spacing: 1.5rem;
+        }
+
+        .page-header {
+            padding: 2rem var(--container-padding);
+        }
+
+        th, td {
+            padding: 0.75rem;
+        }
+
+        .legend-item {
+            padding: 0.35rem 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        /* Adjust card padding */
+        :root {
+            --card-padding: 0.75rem;
+            --container-padding: 0.75rem;
+            --section-spacing: 1rem;
+        }
+
+        /* Improve mobile table layout */
+        .md\:hidden td {
+            padding: 0.75rem;
+        }
+
+        /* Make mobile details button more prominent */
+        .collapsible-header {
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        /* Improve collapsible content spacing */
+        .collapsible-content {
+            margin-top: 0.5rem;
+            border-radius: 0.375rem;
+            padding: 0.75rem;
+        }
+
+        /* Improve stats cards on mobile */
+        .stats-card {
+            padding: var(--card-padding);
+        }
+
+        /* Better button spacing on mobile */
+        .text-center.mt-4.space-x-2 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            padding: 0.5rem;
+        }
+
+        .uk-button {
+            padding: 0.375rem 0.5rem;
+            font-size: 0.875rem;
+            white-space: nowrap;
+        }
+
+        /* Improve legend layout on mobile */
+        .legend {
+            gap: 0.5rem;
+            padding: 0.25rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .legend-item {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        /* Improve mobile search */
+        #accountSearch {
+            padding: 0.75rem;
+            font-size: 0.875rem;
+        }
+
+        .uk-table-responsive td {
+            padding: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .uk-table-responsive th {
+            display: none;
+        }
+
+        /* Fix mobile view content */
+        .md\:hidden {
+            display: block !important;
+        }
+
+        .hidden.md\:table-cell {
+            display: none !important;
+        }
+
+        .mobile-row {
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .mobile-row-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            cursor: pointer;
+        }
+
+        .mobile-row-content {
+            display: none;
+            padding: 0.75rem;
+            background-color: #f9fafb;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .mobile-row-content.active {
+            display: block;
+        }
+
+        .mobile-row:last-child {
+            border-bottom: none;
+        }
+
+        .mobile-value {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .collapsible-content {
+            display: none;
+        }
+
+        .collapsible-content.active {
+            display: block;
+        }
+
+        /* Dark mode adjustments */
+        @media (prefers-color-scheme: dark) {
+            .mobile-row {
+                border-bottom-color: #374151;
+            }
+
+            .mobile-row-content {
+                background-color: #1f2937;
+                border-top-color: #374151;
+            }
+
+            .mobile-value {
+                color: #9ca3af;
+            }
+        }
+    }
+
+    /* Dark mode improvements */
+    @media (prefers-color-scheme: dark) {
+        .stats-card, .chart-wrapper {
+            background: #1f2937;
+            border: 1px solid #374151;
+        }
+
+        #accountSearch {
+            background-color: #1f2937;
+            border-color: #374151;
+            color: white;
+        }
+
+        th {
+            background-color: #111827;
+            color: #e5e7eb;
+        }
+
+        td {
+            border-bottom-color: #374151;
+        }
+
+        .legend-item {
+            background-color: #374151;
+            color: #e5e7eb;
+        }
+
+        .legend-item:hover {
+            background-color: #4b5563;
+        }
+
+        .collapsible-header {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .collapsible-content {
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .uk-button {
+            border-color: #374151;
+        }
+
+        .uk-button:hover {
+            background-color: #374151;
+        }
+
+        .uk-button.active {
+            background-color: #2563eb;
+            border-color: #2563eb;
+        }
+    }
+
+    /* Extra small device improvements */
+    @media (max-width: 360px) {
+        :root {
+            --card-padding: 0.5rem;
+            --container-padding: 0.5rem;
+        }
+
+        .legend-item {
+            padding: 0.25rem;
+            font-size: 0.7rem;
+        }
+
+        .uk-button {
+            padding: 0.25rem 0.375rem;
+            font-size: 0.75rem;
+        }
+    }
+
+    /* Improve table responsiveness */
+    .uk-table-responsive {
+        margin-bottom: 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="container mx-auto px-4">
+        <h1 class="text-4xl font-bold text-center mb-2">Quicksilver Stock Exchange</h1>
+        <p class="text-center text-lg opacity-90">Last updated {{ update_time }}</p>
+        <div class="text-center mt-4 flex items-center justify-center gap-2">
+            <span class="text-sm font-medium opacity-90">Created by</span>
+            <span class="font-semibold">Pinak Paliwal</span>
+            <span class="mx-2 text-gray-400">|</span>
+            <a href="https://github.com/lelandstocks/lelandstocks.github.io" 
+               class="inline-flex items-center text-white hover:text-gray-200 transition-colors duration-200">
+                <svg class="w-5 h-5 mr-1.5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                </svg>
+                View on GitHub
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="container mx-auto px-2 sm:px-4">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-6 min-h-[calc(100vh-16rem)]">
+        <!-- Left side: Chart and Podcast -->
+        <div class="lg:col-span-8 space-y-6">
+            <!-- Chart section -->
+            <div class="chart-wrapper">
+                <div class="legend flex flex-wrap justify-center mb-4 gap-4">
+                    <div class="legend-item cursor-pointer" data-series="min">
+                        <span class="legend-color" style="background: #4BC0C0"></span>Min
+                    </div>
+                    <div class="legend-item cursor-pointer active" data-series="q1">
+                        <span class="legend-color" style="background: #9966FF"></span>Q1
+                    </div>
+                    <div class="legend-item cursor-pointer active" data-series="median">
+                        <span class="legend-color" style="background: #FFCE56"></span>Median
+                    </div>
+                    <div class="legend-item cursor-pointer active" data-series="q3">
+                        <span class="legend-color" style="background: #FF9F40"></span>Q3
+                    </div>
+                    <div class="legend-item cursor-pointer" data-series="max">
+                        <span class="legend-color" style="background: #36A2EB"></span>Max
+                    </div>
+                    <div class="legend-item cursor-pointer active" data-series="sp500">
+                        <span class="legend-color" style="background: #FF6384"></span>S&P 500
+                    </div>
+                </div>
+                <div class="chart-container" id="chart-container">
+                    <div id="stockChart" class="w-full h-full"></div>
+                </div>
+                <div class="text-center mt-4 grid grid-cols-3 sm:grid-cols-6 gap-2 px-2">
+                    <button class="uk-button uk-button-default col-span-3 sm:col-span-1" id="toggleTrendlines">Show Trends</button>
+                    <button class="uk-button uk-button-default col-span-3 sm:col-span-1" id="resetZoom">Reset Zoom</button>
+                    <button class="uk-button uk-button-default time-range" data-days="1">1D</button>
+                    <button class="uk-button uk-button-default time-range" data-days="7">1W</button>
+                    <button class="uk-button uk-button-default time-range" data-days="30">1M</button>
+                    <button class="uk-button uk-button-default time-range" data-days="365">1Y</button>
+                </div>
+            </div>
+
+            <!-- Podcast section moved here -->
+            <div class="stats-card">
+                <h2 class="text-xl font-semibold mb-4 text-center">Daily Market Update</h2>
+                {% if podcast_file %}
+                    <div class="mb-4">
+                        <p class="text-center">Daily Generated</p>
+                        <audio controls class="w-full">
+                            <source src="/data/audio/{{ podcast_file }}" type="audio/mpeg">
+                            Your browser does not support the audio element.
+                        </audio>
+                    </div>
+                {% else %}
+                    <p class="text-center">No podcast available at the moment.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Right side: Stats -->
+        <div class="lg:col-span-4 grid gap-3 sm:gap-6">
+            <!-- Summary Statistics -->
+            <div class="stats-card overflow-hidden">
+                <div class="flex justify-between items-center mb-4 cursor-pointer md:cursor-default" id="summaryHeader">
+                    <h2 class="text-xl font-semibold">Summary Statistics</h2>
+                    <svg class="w-6 h-6 md:hidden transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </div>
+                <div class="space-y-2 sm:space-y-3 hidden md:block" id="summaryContent">
+                    <div class="flex justify-between">
+                        <span>Miller Tracker</span>
+                        <span class="font-medium">#{{ miller_location }}th place</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Average Money</span>
+                        <span class="font-medium">{{ average_money }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Q1 Money</span>
+                        <span class="font-medium">{{ q1_money }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Median Money</span>
+                        <span class="font-medium">{{ median_money }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Q3 Money</span>
+                        <span class="font-medium">{{ q3_money }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Standard Deviation Money</span>
+                        <span class="font-medium">{{ std_money }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Popular Stocks -->
+            <div class="stats-card overflow-hidden">
+                <div class="flex justify-between items-center mb-4 cursor-pointer md:cursor-default" id="stocksHeader">
+                    <h2 class="text-xl font-semibold">Popular Stocks</h2>
+                    <svg class="w-6 h-6 md:hidden transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </div>
+                <div class="max-h-[200px] sm:max-h-[300px] overflow-y-auto hidden md:block" id="stocksContent">
+                    <table class="uk-table uk-table-striped uk-table-responsive">
+                        <thead>
+                            <tr>
+                                <th>Stock</th>
+                                <th>Count</th>
+                                <th>Current Value</th>
+                                <th>Initial Value</th>
+                                <th>Return</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for stock, count, current, initial, pct in stock_cnt %}
+                            <tr>
+                                <td>
+                                    <a href="https://finance.yahoo.com/quote/{{ stock }}" 
+                                       target="_blank" 
+                                       class="hover:underline">{{ stock }}</a>
+                                </td>
+                                <td>{{ count }}</td>
+                                <td>${{ '{:,.2f}'.format(current) }}</td>
+                                <td>${{ '{:,.2f}'.format(initial) }}</td>
+                                <td class="{% if pct >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                    {{ '{:+.1f}%'.format(pct) }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and rankings -->
+    <div class="stats-card mt-8">
+        <div class="max-w-2xl mx-auto mb-6">
+            <input type="text" 
+                   id="accountSearch" 
+                   placeholder="Search for accounts or stocks..."
+                   class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full" id="rankings">
+                <thead class="hidden md:table-header-group">
+                    <tr>
+                        <th class="px-4 py-2 no-sort">Rank</th>
+                        <th class="px-4 py-2 no-sort">Account</th>
+                        <th class="hidden md:table-cell px-4 py-2 no-sort">Account Value</th>
+                        <th class="hidden md:table-cell px-4 py-2 no-sort">Stocks Invested</th>
+                        <th class="hidden md:table-cell px-4 py-2 no-sort">Z-Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in row_data %}
+                    <tr class="border-b {% if 'teachermiller' in row %}font-bold{% endif %}">
+                        <!-- Mobile view -->
+                        <td class="md:hidden mobile-row">
+                            <div class="mobile-row-header" onclick="toggleMobileRow(this)">
+                                <div class="flex items-center space-x-4">
+                                    <span class="text-sm font-medium">#{{ row[0] }}</span>
+                                    <span>{{ row[1] | safe }}</span>
+                                </div>
+                                <svg class="w-5 h-5 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                </svg>
+                            </div>
+                            <div class="mobile-row-content">
+                                <div class="space-y-2">
+                                    <p><span class="font-medium">Account Value:</span> <span class="mobile-value">{{ row[2] }}</span></p>
+                                    <p><span class="font-medium">Stocks Invested:</span> <span class="mobile-value">{{ row[3] }}</span></p>
+                                    <p><span class="font-medium">Z-Score:</span> <span class="mobile-value">{{ row[4] }}</span></p>
+                                </div>
+                            </div>
+                        </td>
+                        <!-- Desktop view -->
+                        <td class="hidden md:table-cell px-4 py-2">{{ row[0] }}</td>
+                        <td class="hidden md:table-cell px-4 py-2">{{ row[1] | safe }}</td>
+                        <td class="hidden md:table-cell px-4 py-2">{{ row[2] }}</td>
+                        <td class="hidden md:table-cell px-4 py-2">{{ row[3] }}</td>
+                        <td class="hidden md:table-cell px-4 py-2">{{ row[4] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function convertTZ(date, tzString) {
+        return new Date((typeof date === "string" ? new Date(date) : date).toLocaleString("en-US", {timeZone: tzString}));   
+    }
+
+    function isDarkMode() {
+        return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+
+    function getChartColors() {
+        return {
+            background: isDarkMode() ? '#1a1a1a' : '#ffffff',
+            text: isDarkMode() ? '#ffffff' : '#333333',
+            grid: isDarkMode() ? '#333333' : '#f0f0f0',
+            border: isDarkMode() ? '#4a4a4a' : '#d1d4dc'
+        };
+    }
+
+    function updateChartColors() {
+        const colors = getChartColors();
+        chart.applyOptions({
+            layout: {
+                background: { type: 'solid', color: colors.background },
+                textColor: colors.text,
+            },
+            grid: {
+                vertLines: { color: colors.grid },
+                horzLines: { color: colors.grid },
+            },
+            timeScale: {
+                borderColor: colors.border,
+            },
+            rightPriceScale: {
+                borderColor: colors.border,
+            }
+        });
+    }
+
+    // Wrap chart initialization in a function
+    function initializeChart() {
+        const chartContainer = document.getElementById('stockChart');
+        
+        if (!chartContainer) {
+            console.error('Chart container element not found');
+            return;
+        }
+
+        const colors = getChartColors();
+        const chartOptions = {
+            width: chartContainer.clientWidth,
+            height: chartContainer.clientHeight,
+            layout: {
+                background: { type: 'solid', color: colors.background },
+                textColor: colors.text,
+                fontSize: 12,
+            },
+            grid: {
+                vertLines: { color: colors.grid },
+                horzLines: { color: colors.grid },
+            },
+            timeScale: {
+                timeVisible: true,
+                borderColor: colors.border,
+                rightOffset: 5,
+                barSpacing: 10,
+                fixLeftEdge: true,
+                fixRightEdge: true,
+                timeZone: 'America/Los_Angeles',  // Add this line
+            },
+            rightPriceScale: {
+                borderColor: colors.border,
+                autoScale: true,
+            },
+            watermark: {
+                color: 'rgba(0, 0, 0, 0)',
+            },
+            leftPriceScale: {
+                visible: false,
+            },
+            handleScale: {
+                mouseWheel: true,
+                pinch: true,
+                axisPressedMouseMove: true,
+            },
+            handleScroll: {
+                mouseWheel: true,
+                pressedMouseMove: true,
+                horzTouchDrag: true,
+                vertTouchDrag: true
+            },
+        };
+
+        // Add color scheme change listener
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateChartColors);
+
+        const chart = LightweightCharts.createChart(chartContainer, chartOptions);
+
+        const labels = {{ labels | safe }};
+        
+        // Define all series first
+        const sp500Series = chart.addAreaSeries({
+            lineColor: '#FF6384',
+            topColor: 'rgba(255, 99, 132, 0.4)',
+            bottomColor: 'rgba(255, 99, 132, 0.1)',
+            lineWidth: 2,
+        });
+        
+        const q1Series = chart.addAreaSeries({
+            lineColor: '#9966FF',
+            topColor: 'rgba(153, 102, 255, 0.4)',
+            bottomColor: 'rgba(153, 102, 255, 0.1)',
+            lineWidth: 2,
+        });
+
+        const medianSeries = chart.addAreaSeries({
+            lineColor: '#FFCE56',
+            topColor: 'rgba(255, 206, 86, 0.4)',
+            bottomColor: 'rgba(255, 206, 86, 0.1)',
+            lineWidth: 2,
+        });
+
+        const q3Series = chart.addAreaSeries({
+            lineColor: '#FF9F40',
+            topColor: 'rgba(255, 159, 64, 0.4)',
+            bottomColor: 'rgba(255, 159, 64, 0.1)',
+            lineWidth: 2,
+        });
+
+        const minSeries = chart.addAreaSeries({
+            lineColor: '#4BC0C0',
+            topColor: 'rgba(75, 192, 192, 0.4)',
+            bottomColor: 'rgba(75, 192, 192, 0.1)',
+            lineWidth: 2,
+            visible: false,  // Add this line
+        });
+
+        const maxSeries = chart.addAreaSeries({
+            lineColor: '#36A2EB',
+            topColor: 'rgba(54, 162, 235, 0.4)',
+            bottomColor: 'rgba(54, 162, 235, 0.1)',
+            lineWidth: 2,
+            visible: false,  // Add this line
+        });
+
+        // Create and process data with proper timestamps
+        const sp500Data = labels.map((timeStr, i) => {
+            const date = new Date(timeStr);
+            // Convert to PST
+            const pstDate = convertTZ(date, 'America/Los_Angeles');
+            return {
+                time: Math.floor(pstDate.getTime() / 1000),
+                value: {{ sp500_prices | safe }}[i] || 0
+            };
+        }).filter(item => item.value !== 0);
+
+        const q1Data = labels.map((timeStr, i) => {
+            const date = new Date(timeStr);
+            // Convert to PST
+            const pstDate = convertTZ(date, 'America/Los_Angeles');
+            return {
+                time: Math.floor(pstDate.getTime() / 1000),
+                value: {{ q1_monies | safe }}[i] || 0
+            };
+        }).filter(item => item.value !== 0);
+
+        const medianData = labels.map((timeStr, i) => {
+            const date = new Date(timeStr);
+            // Convert to PST
+            const pstDate = convertTZ(date, 'America/Los_Angeles');
+            return {
+                time: Math.floor(pstDate.getTime() / 1000),
+                value: {{ median_monies | safe }}[i] || 0
+            };
+        }).filter(item => item.value !== 0);
+
+        const q3Data = labels.map((timeStr, i) => {
+            const date = new Date(timeStr);
+            // Convert to PST
+            const pstDate = convertTZ(date, 'America/Los_Angeles');
+            return {
+                time: Math.floor(pstDate.getTime() / 1000),
+                value: {{ q3_monies | safe }}[i] || 0
+            };
+        }).filter(item => item.value !== 0);
+
+        const minData = labels.map((timeStr, i) => {
+            const date = new Date(timeStr);
+            const pstDate = convertTZ(date, 'America/Los_Angeles');
+            return {
+                time: Math.floor(pstDate.getTime() / 1000),
+                value: {{ min_monies | safe }}[i] || 0
+            };
+        }).filter(item => item.value !== 0);
+
+        const maxData = labels.map((timeStr, i) => {
+            const date = new Date(timeStr);
+            const pstDate = convertTZ(date, 'America/Los_Angeles');
+            return {
+                time: Math.floor(pstDate.getTime() / 1000),
+                value: {{ max_monies | safe }}[i] || 0
+            };
+        }).filter(item => item.value !== 0);
+
+        // Sort all data arrays
+        sp500Data.sort((a, b) => a.time - b.time);
+        q1Data.sort((a, b) => a.time - b.time);
+        medianData.sort((a, b) => a.time - b.time);
+        q3Data.sort((a, b) => a.time - b.time);
+        minData.sort((a, b) => a.time - b.time);
+        maxData.sort((a, b) => a.time - b.time);
+
+        sp500Series.setData(sp500Data);
+        q1Series.setData(q1Data);
+        medianSeries.setData(medianData);
+        q3Series.setData(q3Data);
+        minSeries.setData(minData);
+        maxSeries.setData(maxData);
+
+        chart.timeScale().fitContent();
+
+        // Improved resize handler with debouncing
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            if (resizeTimeout) clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                const parent = chartContainer.parentElement;
+                chart.applyOptions({
+                    width: parent.offsetWidth,
+                    height: parent.offsetHeight
+                });
+                chart.timeScale().fitContent();
+            }, 100);
+        });
+
+        // Add resize observer for better size management
+        const resizeObserver = new ResizeObserver(entries => {
+            entries.forEach(entry => {
+                chart.applyOptions({
+                    width: entry.contentRect.width,
+                    height: entry.contentRect.height
+                });
+                chart.timeScale().fitContent();
+            });
+        });
+
+        resizeObserver.observe(chartContainer);
+
+        // Update reset zoom handler
+        document.getElementById('resetZoom').addEventListener('click', () => {
+            chart.timeScale().fitContent();
+            chart.priceScale('right').applyOptions({
+                autoScale: true
+            });
+        });
+
+        // Add time range functionality with active state
+        document.querySelectorAll('.time-range').forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all time range buttons
+                document.querySelectorAll('.time-range').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                // Add active class to clicked button
+                button.classList.add('active');
+                
+                const days = parseInt(button.dataset.days);
+                const now = Math.floor(Date.now() / 1000);
+                const start = now - (days * 24 * 60 * 60);
+                
+                chart.timeScale().setVisibleRange({
+                    from: start,
+                    to: now,
+                });
+            });
+        });
+
+        // Store series in an object for easy access
+        const series = {
+            min: minSeries,
+            max: maxSeries,
+            q1: q1Series,
+            q3: q3Series,
+            median: medianSeries,
+            sp500: sp500Series
+        };
+
+        // Replace button toggle functionality with legend toggle
+        document.querySelectorAll('.legend-item').forEach(item => {
+            // Initial visibility based on 'active' class
+            const seriesName = item.dataset.series;
+            if (series[seriesName]) {
+                series[seriesName].applyOptions({
+                    visible: item.classList.contains('active')
+                });
+            }
+
+            item.addEventListener('click', () => {
+                const seriesName = item.dataset.series;
+                if (series[seriesName]) {
+                    item.classList.toggle('active');
+                    const isVisible = item.classList.contains('active');
+                    series[seriesName].applyOptions({
+                        visible: isVisible
+                    });
+                    // Update trendline if it exists and trendlines are visible
+                    if (trendSeries[seriesName] && trendlinesVisible) {
+                        trendSeries[seriesName].applyOptions({
+                            visible: isVisible
+                        });
+                    }
+                }
+            });
+        });
+
+        // Add after chart initialization:
+        function calculateTrendline(data) {
+            const n = data.length;
+            if (n < 2) return null;
+
+            let sumX = 0;
+            let sumY = 0;
+            let sumXY = 0;
+            let sumX2 = 0;
+
+            data.forEach(point => {
+                sumX += point.time;
+                sumY += point.value;
+                sumXY += point.time * point.value;
+                sumX2 += point.time * point.time;
+            });
+
+            const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+            const intercept = (sumY - slope * sumX) / n;
+
+            return {
+                start: { time: data[0].time, value: slope * data[0].time + intercept },
+                end: { time: data[n-1].time, value: slope * data[n-1].time + intercept }
+            };
+        }
+
+        const trendSeries = {};
+        let trendlinesVisible = false;
+
+        document.getElementById('toggleTrendlines').addEventListener('click', function() {
+            trendlinesVisible = !trendlinesVisible;
+            this.classList.toggle('active');
+            this.textContent = this.classList.contains('active') ? 'Hide Trends' : 'Show Trends';
+
+            Object.keys(series).forEach(key => {
+                if (series[key].options().visible) {
+                    if (trendlinesVisible) {
+                        if (!trendSeries[key]) {
+                            const trendline = calculateTrendline(
+                                key === 'sp500' ? sp500Data :
+                                key === 'q1' ? q1Data :
+                                key === 'median' ? medianData :
+                                key === 'q3' ? q3Data :
+                                key === 'min' ? minData : maxData
+                            );
+                            if (trendline) {
+                                trendSeries[key] = chart.addLineSeries({
+                                    color: series[key].options().lineColor,
+                                    lineWidth: 1,
+                                    lineStyle: 2, // Dashed line
+                                });
+                                trendSeries[key].setData([trendline.start, trendline.end]);
+                            }
+                        } else {
+                            trendSeries[key].applyOptions({ visible: true });
+                        }
+                    } else if (trendSeries[key]) {
+                        trendSeries[key].applyOptions({ visible: false });
+                    }
+                }
+            });
+        });
+
+        // Update legend click handler
+        document.querySelectorAll('.legend-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const seriesName = item.dataset.series;
+                item.classList.toggle('active');
+                const isVisible = item.classList.contains('active');
+                series[seriesName].applyOptions({
+                    visible: isVisible
+                });
+                if (trendSeries[seriesName]) {
+                    trendSeries[seriesName].applyOptions({
+                        visible: isVisible && trendlinesVisible
+                    });
+                }
+            });
+        });
+    }
+
+    // Call the initialization function when DOM is loaded
+    document.addEventListener('DOMContentLoaded', initializeChart);
+
+    // get the input element
+    const searchInput = document.getElementById('accountSearch');
+
+    // get specifically the rankings table by ID
+    const rankingsTable = document.getElementById('rankings');
+
+    // get all table rows that contain account information (skip the header row)
+    const tableRows = Array.from(rankingsTable.querySelectorAll('tr')).slice(1);
+
+    // add event listener for input changes
+    searchInput.addEventListener('input', function (e) {
+        const searchTerm = e.target.value.toLowerCase();
+
+        // loop through only the rows in the rankings table
+        tableRows.forEach(row => {
+            // get text content from each column
+            const rankingText = row.querySelector('td:nth-child(1)')?.textContent.toLowerCase() || '';
+            const accountName = row.querySelector('td:nth-child(2) a')?.textContent.toLowerCase() || '';
+            const moneyText = row.querySelector('td:nth-child(3)')?.textContent.toLowerCase() || '';
+            const stocksText = row.querySelector('td:nth-child(4)')?.textContent.toLowerCase() || '';
+            //const zScoreText = row.querySelector('td:nth-child(5)')?.textContent.toLowerCase() || '';
+
+            // check if the search term matches any of the fields
+            const matches = rankingText.includes(searchTerm) ||
+                accountName.includes(searchTerm) ||
+                moneyText.includes(searchTerm) ||
+                stocksText.includes(searchTerm);
+                //zScoreText.includes(searchTerm);
+
+            // show/hide the row based on match
+            row.style.display = matches ? '' : 'none';
+        });
+    });
+
+    // Add this at the end of your existing scripts block
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add click handlers for collapsible sections
+        document.querySelectorAll('.collapsible-header').forEach(header => {
+            header.addEventListener('click', function() {
+                const content = this.closest('div').nextElementSibling;
+                const icon = this.querySelector('.toggle-icon');
+                
+                // Close all other open sections
+                document.querySelectorAll('.collapsible-content.active').forEach(item => {
+                    if (item !== content) {
+                        item.classList.remove('active');
+                        const otherIcon = item.previousElementSibling.querySelector('.toggle-icon');
+                        if (otherIcon) otherIcon.classList.remove('active');
+                    }
+                });
+                
+                // Toggle current section
+                content.classList.toggle('active');
+                icon.classList.toggle('active');
+            });
+        });
+    });
+
+    // Add mobile collapsible functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add these styles dynamically
+        const style = document.createElement('style');
+        style.textContent = `
+            @media (max-width: 768px) {
+                .rotate-180 {
+                    transform: rotate(180deg);
+                }
+                
+                .collapse-active {
+                    display: block !important;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        function setupCollapsible(headerId, contentId) {
+            const header = document.getElementById(headerId);
+            const content = document.getElementById(contentId);
+            const arrow = header.querySelector('svg');
+
+            if (window.innerWidth < 768) {
+                header.addEventListener('click', () => {
+                    content.classList.toggle('collapse-active');
+                    arrow.classList.toggle('rotate-180');
+                });
+            }
+        }
+
+        setupCollapsible('summaryHeader', 'summaryContent');
+        setupCollapsible('stocksHeader', 'stocksContent');
+
+        // Update visibility on resize
+        window.addEventListener('resize', () => {
+            const contents = document.querySelectorAll('#summaryContent, #stocksContent');
+            if (window.innerWidth >= 768) {
+                contents.forEach(content => {
+                    content.classList.remove('hidden');
+                    content.classList.add('block');
+                });
+            } else {
+                contents.forEach(content => {
+                    if (!content.classList.contains('collapse-active')) {
+                        content.classList.add('hidden');
+                    }
+                });
+            }
+        });
+    });
+
+    // Add table sorting functionality 
+    document.addEventListener('DOMContentLoaded', function() {
+        function getTableCellValue(tr, idx) {
+            const td = tr.children[idx];
+            const text = td.innerText || td.textContent;
+            
+            // If cell contains a link, get text from the link
+            const link = td.querySelector('a');
+            if (link) return link.textContent.toLowerCase();
+            
+            // Handle currency values (e.g. $1,234.56)
+            if (text.includes('$')) {
+                return parseFloat(text.replace(/[$,]/g, ''));
+            }
+            
+            // Handle percentage values (e.g. +12.34% or -12.34%)
+            if (text.includes('%')) {
+                return parseFloat(text.replace(/[+%]/g, ''));
+            }
+
+            // If the text can be parsed as a number, return a number
+            const num = parseFloat(text.replace(/,/g, ''));
+            return isNaN(num) ? text.toLowerCase() : num;
+        }
+
+        function comparer(idx, asc) {
+            return function(a, b) {
+                const valA = getTableCellValue(asc ? a : b, idx);
+                const valB = getTableCellValue(asc ? b : a, idx);
+                
+                // Compare numbers
+                if (typeof valA === 'number' && typeof valB === 'number') {
+                    return valA - valB;
+                }
+                
+                // Compare strings
+                return String(valA).localeCompare(String(valB), undefined, {
+                    numeric: true,
+                    sensitivity: 'base'
+                });
+            };
+        }
+
+        // Add sorting to all tables
+        document.querySelectorAll('table').forEach(table => {
+            const thead = table.querySelector('thead');
+            if (!thead) return; // Skip tables without headers
+            
+            const headers = thead.querySelectorAll('th');
+            headers.forEach((th, idx) => {
+                if (th.classList.contains('no-sort')) return;
+                
+                // Add sort indicators and styling
+                th.style.cursor = 'pointer';
+                const span = document.createElement('span');
+                span.className = 'sort-icon both';
+                th.appendChild(span);
+                
+                let ascending = true;
+                
+                th.addEventListener('click', () => {
+                    const tbody = table.querySelector('tbody');
+                    Array.from(tbody.querySelectorAll('tr'))
+                        .sort(comparer(idx, ascending = !ascending))
+                        .forEach(tr => tbody.appendChild(tr));
+
+                    // Update all sort icons to neutral state
+                    headers.forEach(h => {
+                        const icon = h.querySelector('.sort-icon');
+                        if (icon) icon.className = 'sort-icon both';
+                    });
+
+                    // Update clicked header's icon
+                    span.className = `sort-icon ${ascending ? 'asc' : 'desc'}`;
+                });
+            });
+        });
+    });
+
+    function toggleMobileRow(element) {
+        const content = element.parentElement.querySelector('.mobile-row-content');
+        const arrow = element.querySelector('svg');
+        
+        // Close all other open rows
+        document.querySelectorAll('.mobile-row-content.active').forEach(item => {
+            if (item !== content) {
+                item.classList.remove('active');
+                item.previousElementSibling.querySelector('svg').classList.remove('rotate-180');
+            }
+        });
+        
+        // Toggle current row
+        content.classList.toggle('active');
+        arrow.classList.toggle('rotate-180');
+    }
+
+    // Initialize mobile view on load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Hide all mobile row content initially
+        document.querySelectorAll('.mobile-row-content').forEach(content => {
+            content.classList.remove('active');
+        });
+    });
+</script>
+{% endblock %}
