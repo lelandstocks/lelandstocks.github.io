@@ -53,7 +53,7 @@ async def login(page):
     COOKIE_PATH = "./backend/cookies.pkl"
 
     # First try to use cookies
-    await page.goto("https://www.investopedia.com/simulator", wait_until="networkidle")
+    await page.goto("https://www.investopedia.com/simulator/portfolio", wait_until="networkidle")
     if await load_cookies(page.context, COOKIE_PATH):
         await page.goto(
             "https://www.investopedia.com/simulator/home.aspx", wait_until="networkidle"
